@@ -10,9 +10,6 @@ count_chars <- function(line) {
     dplyr::rename(count = n)
 }
 
-# non_delimiter_characters
-non_delimiter_characters <- purrr::map_chr(c(letters, LETTERS, 0:9, ".", "'", '"'), ~ .x %>% charToRaw %>% as.character)
-
 # Guess delimiter of a file
 guess_delim <- function(file, n_max = 10, verbose = FALSE) {
   
@@ -20,7 +17,11 @@ guess_delim <- function(file, n_max = 10, verbose = FALSE) {
   safe_read <- purrr::possibly(readr::read_lines, NULL)
   lines <- safe_read(file, n_max = n_max)
   
-  # Guessdiles
+  # non_delimiter_characters
+  non_delimiter_characters <- purrr::map_chr(c(letters, LETTERS, 0:9, ".", "'", '"'), ~ .x %>% charToRaw %>% as.character)
+  
+  
+  # the candidates to be delims
   probable_delims <- lines %>%
     purrr::map_df(~count_chars(.x), .id = "line") %>%  # Get char count for each line
     dplyr::filter(!char_raw %in% non_delimiter_characters) %>% # disconsider letters and numbers for delimiter candidates
