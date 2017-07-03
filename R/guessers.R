@@ -63,8 +63,8 @@ guess_has_header <- function(file, n_max = 10, verbose = FALSE) {
   header <- w_header*0.9 > wo_header
     
   # Message header found
-  if(verbose & header) message("The file probably has a header")
-  if else (verbose & !header) message("The file probably doesn't have a header")
+  if(verbose & header) message("File probably has a header")
+  else if (verbose & !header) message("File probably doesn't have a header")
   
   return(header)
 }
@@ -87,19 +87,19 @@ guess_col_types <- function(file, n_max = 10, verbose = FALSE) {
 # guess_comment
 
 # Detect and return a tabular file configuration
-frk_summarise_tabular_file <- function(file, n_max = 10) {
+frk_summarise_tabular_file <- function(file, n_max = 10, verbose = FALSE) {
   
   # Guess delim
-  guessed_delim = guess_delim(file)$char[1]
+  guessed_delim = guess_delim(file, n_max, verbose)$char[1]
   
   # Guess encoding
   guessed_encoding = readr::guess_encoding(file)$encoding[1]
   
   # Guess has header
-  guessed_has_header = guess_has_header(file)
+  guessed_has_header = guess_has_header(file, n_max, verbose)
   
   # Guess col types
-  guessed_col_types = guess_col_types(file)
+  guessed_col_types = guess_col_types(file, n_max, verbose)
   
   return(list(
     file = file,
