@@ -38,6 +38,18 @@ guess_delim <- function(file, n_max = 10, verbose = FALSE) {
   return(probable_delims)
 }
 
+# Guess encoding of a file
+guess_encoding <- function(file, verbose = FALSE) {
+  
+  # Guess encoding
+  encoding <- readr::guess_encoding(file)$encoding[1]
+  
+  # Message encoding found
+  if(verbose) message(sprintf("Most probable encoding: '%s'", encoding))
+  
+  return(encoding)
+}
+
 # detect_first_row_with_content
 
 # detect_blank_lines
@@ -93,7 +105,7 @@ frk_summarise_tabular_file <- function(file, n_max = 10, verbose = FALSE) {
   guessed_delim = guess_delim(file, n_max, verbose)$char[1]
   
   # Guess encoding
-  guessed_encoding = readr::guess_encoding(file)$encoding[1]
+  guessed_encoding = guess_encoding(file, verbose)
   
   # Guess has header
   guessed_has_header = guess_has_header(file, n_max, verbose)
