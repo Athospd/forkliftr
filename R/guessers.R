@@ -49,7 +49,7 @@ guess_delim <- function(file, n_max = 10, verbose = FALSE) {
 # guess_quote
 
 # Guess whether file has header
-guess_has_col_names <- function(file, n_max = 10, verbose = FALSE) {
+guess_has_header <- function(file, n_max = 10, verbose = FALSE) {
   
   # Read lines safely
   safe_read <- purrr::possibly(readr::read_lines, NULL)
@@ -83,8 +83,8 @@ frk_summarise_tabular_file <- function(file, n_max = 10) {
   # guess encoding
   guessed_encoding = readr::guess_encoding(file)$encoding[1]
   
-  # guess has col names
-  guess_has_col_names = guess_has_col_names(file)
+  # guess has header
+  guess_has_header = guess_has_header(file)
   
   return(list(
     file = file,
