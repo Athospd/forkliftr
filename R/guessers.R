@@ -2,7 +2,7 @@
 count_chars <- function(line) {
   
   # Create table with chars
-  t <- tibble(char_raw = charToRaw(line) %>% as.character)
+  t <- tibble::tibble(char_raw = charToRaw(line) %>% as.character)
   
   # Return counts
   t %>% 
@@ -24,11 +24,11 @@ guess_delim <- function(file, n_max = 10, verbose = FALSE) {
   # The candidates to be delims
   probable_delims <- lines %>%
     purrr::map_df(~count_chars(.x), .id = "line") %>%  # Get char count for each line
-    dplyr::filter(!char_raw %in% non_delimiter_characters) %>% # disconsider letters and numbers for delimiter candidates
+    dplyr::filter(!char_raw %in% non_delimiter_characters) %>% # Disconsider letters and numbers for delimiter candidates
     dplyr::group_by(char_raw) %>%                    # Get chars with same count
     dplyr::summarise(var = var(count), n = n()) %>%
     dplyr::mutate(char = purrr::map_chr(char_raw, ~ .x %>% as.hexmode %>% as.raw %>% rawToChar)) %>%
-    dplyr::arrange(var, n %>% desc, char_raw) 
+    dplyr::arrange(var, n %>% dplyr::desc(), char_raw) 
   
   most_probable_delim <- probable_delims$char[1]
   
@@ -63,13 +63,26 @@ guess_has_header <- function(file, n_max = 10, verbose = FALSE) {
   header <- w_header*0.9 > wo_header
     
   # Message header found
-  if(header) message("The file probably has a header")
-  else message("The file probably doesn't have a header")
+  if(verbose & header) message("The file probably has a header")
+  if else (verbose & !header) message("The file probably doesn't have a header")
   
   return(header)
 }
 
-# guess_col_types
+# Guess column types
+guess_col_types <- function(file, n_max = 10, verbose = FALSE) {
+  
+  # Get file column specification
+  if (verbose) read_file <- readr::read_csv(file, n_max = n_max)
+  else read_file <- suppressMessages(readr::read_csv(file, n_max = n_max))
+  col_spec <- attr(read_file, "spec")$cols
+  
+  # Get colum types
+  collectors <- purrr::map_chr(col_spec, ~attr(.x, "class")[1])
+  types <- stringr::str_replace(collectors, "collector_", "")
+  
+  return(types)
+}
 
 # guess_comment
 
@@ -83,13 +96,17 @@ frk_summarise_tabular_file <- function(file, n_max = 10) {
   guessed_encoding = readr::guess_encoding(file)$encoding[1]
   
   # Guess has header
-  guess_has_header = guess_has_header(file)
+  guessed_has_header = guess_has_header(file)
+  
+  # Guess col types
+  guessed_col_types = guess_col_types(file)
   
   return(list(
     file = file,
     guessed_delim = guessed_delim,
     guessed_encoding = guessed_encoding,
-    guess_has_header = guess_has_header
+    guessed_has_header = guessed_has_header,
+    guessed_col_types = guessed_col_types
   ))
 }
 
