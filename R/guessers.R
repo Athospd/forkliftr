@@ -68,11 +68,11 @@ guess_has_header <- function(file, n_max = 10, verbose = FALSE) {
   lines <- safe_read(file, n_max = n_max)
   
   # Get string distances
-  w_header <- stringdist::stringdist(lines[1], stringr::str_c(lines[2:length(lines)], collapse = ""))
-  wo_header <- stringdist::stringdist(lines[2], stringr::str_c(lines[3:length(lines)], collapse = ""))
+  w_header <- mean(stringdist::stringsim(lines[1], lines[2:length(lines)]))
+  wo_header <- mean(stringdist::stringsim(lines[2], lines[3:length(lines)]))
   
   # Check whether header exists
-  header <- w_header*0.9 > wo_header
+  header <- w_header < wo_header*0.5
     
   # Message header found
   if(verbose & header) message("File probably has a header")
