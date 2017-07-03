@@ -48,7 +48,26 @@ guess_delim <- function(file, n_max = 10, verbose = FALSE) {
 
 # guess_quote
 
-# guess_has_col_names
+# Guess whether file has header
+guess_has_col_names <- function(file, n_max = 10, verbose = FALSE) {
+  
+  # Read lines safely
+  safe_read <- purrr::possibly(readr::read_lines, NULL)
+  lines <- safe_read(file, n_max = n_max)
+  
+  # Get string distances
+  w_header <- stringdist::stringdist(lines[1], stringr::str_c(lines[2:length(lines)], collapse = ""))
+  wo_header <- stringdist::stringdist(lines[2], stringr::str_c(lines[3:length(lines)], collapse = ""))
+  
+  # Check whether header exists
+  header <- w_header*0.9 > wo_header
+    
+  # Message header found
+  if(header) message("The file probably has a header")
+  else message("The file probably doesn't have a header")
+  
+  return(header)
+}
 
 # guess_col_types
 
@@ -57,17 +76,21 @@ guess_delim <- function(file, n_max = 10, verbose = FALSE) {
 # 
 
 # Detect and return a tabular file configuration
-frk_summarise_tabular_file <- function(file) {
+frk_summarise_tabular_file <- function(file, n_max = 10) {
   # guess delim
   guessed_delim = guess_delim(file)$char[1]
   
   # guess encoding
   guessed_encoding = readr::guess_encoding(file)$encoding[1]
   
+  # guess has col names
+  guess_has_col_names = guess_has_col_names(file)
+  
   return(list(
     file = file,
     guessed_delim = guessed_delim,
-    guessed_encoding = guessed_encoding
+    guessed_encoding = guessed_encoding,
+    guess_has_col_names = guess_has_col_names
   ))
 }
 
