@@ -3,14 +3,19 @@ Title: Smart Set of Tools to Stack Tabular Files
 Version: 0.0.0.9000
 Authors@R: c(
     person("Athos", "Damiani", , "athos.damiani@gmail.com", role = c("aut", "cre")),
-    person("Caio", "Lente", role = "aut")
-    )
-Description: Functions to help stack tabular files (potentially sharing no common configurations with each other) into one data.frame.
-Depends: R (>= 3.4.0)
-License: MIT
+    person("Caio", "Lente", role = "aut"))
+Description: Functions to help stack tabular files (potentially sharing no common
+    configurations with each other) into one data.frame.
+Depends: R (>= 3.3.0)
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Imports: dplyr,
+Imports:
+    dplyr,
     purrr,
-    readr
+    readr,
+    tibble,
+    stringdist,
+    stringr,
+    magrittr
 RoxygenNote: 6.0.1
