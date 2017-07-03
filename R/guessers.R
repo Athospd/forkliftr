@@ -17,25 +17,29 @@ guess_delim <- function(file, n_max = 10, verbose = FALSE) {
   safe_read <- purrr::possibly(readr::read_lines, NULL)
   lines <- safe_read(file, n_max = n_max)
   
-  # non_delimiter_characters
-  non_delimiter_characters <- purrr::map_chr(c(letters, LETTERS, 0:9, ".", "'", '"'), ~ .x %>% charToRaw %>% as.character)
-  
+  # a priori delimiter ranks (to deal with the ties)
+  data("a_priori_delimiter_ranks", package = "forkliftr")
   
   # the candidates to be delims
-  probable_delims <- lines %>%
+  delims_ordered_by_probability <- lines %>%
     purrr::map_df(~count_chars(.x), .id = "line") %>%  # Get char count for each line
-    dplyr::filter(!char_raw %in% non_delimiter_characters) %>% # disconsider letters and numbers for delimiter candidates
-    dplyr::group_by(char_raw) %>%                    # Get chars with same count
+    dplyr::left_join(a_priori_delimiter_ranks, by = "char_raw") %>%
+    dplyr::mutate(rank = if_else(rank %>% is.na, 1, rank)) %>%
+    dplyr::filter(rank > 0) %>% # disconsider letters and numbers for delimiter candidates
+    dplyr::group_by(rank, char_raw) %>%                    # Get chars with same count
     dplyr::summarise(var = var(count), n = n()) %>%
+    dplyr::ungroup() %>%
     dplyr::mutate(char = purrr::map_chr(char_raw, ~ .x %>% as.hexmode %>% as.raw %>% rawToChar)) %>%
-    dplyr::arrange(var, n %>% desc, char_raw) 
+    dplyr::arrange(var, n %>% desc, rank %>% desc, char_raw) %>%
+    dplyr::slice(1:10) %>%
+    dplyr::select(-rank)
   
-  most_probable_delim <- probable_delims$char[1]
+  most_probable_delim <- delims_ordered_by_probability$char[1]
   
   # Message delimiter found
   if(verbose) message(sprintf("Most probable delimiter: '%s'", most_probable_delim))
   
-  return(probable_delims)
+  return(delims_ordered_by_probability)
 }
 
 # detect_first_row_with_content
