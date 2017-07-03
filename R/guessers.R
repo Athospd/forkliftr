@@ -18,7 +18,7 @@ guess_delim <- function(file, n_max = 10, verbose = FALSE) {
   lines <- safe_read(file, n_max = n_max)
   
   # A priori delimiter ranks (to deal with the ties)
-  data("a_priori_delimiter_ranks", package = "forkliftr")
+  utils::data("a_priori_delimiter_ranks", package = "forkliftr")
   
   # The candidates to be delims
   delims_ordered_by_probability <- lines %>%
