@@ -102,9 +102,11 @@ guess_quote <- function(file, n_max = 10, verbose = FALSE) {
     dplyr::arrange(-mean)
   
   most_probable_quote <- quotes_ordered_by_probability$char[1]
+  most_probable_quote <- ifelse(is.na(most_probable_quote), "", most_probable_quote) 
   
   # Message delimiter found
-  if(verbose) message(sprintf("Most probable quote: '%s'", most_probable_quote))
+  if(verbose & most_probable_quote == "") message(sprintf("Most probable quote: '%s'", most_probable_quote))
+  if(verbose & is.na(most_probable_quote)) message("Most probable quote: '' (unquoted)")
   
   return(most_probable_quote)
 }
