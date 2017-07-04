@@ -137,6 +137,13 @@ frk_summarise_tabular_file <- function(file, n_max = 10, verbose = FALSE) {
 
 # Detect and return all tabular files configurations from a directory
 frk_summarise_tabular_files <- function(path) {
+  
+  # Get summary for all files
   files <- list.files(path, full.names = TRUE)
-  summary <- purrr::map_df(files, frk_summarise_tabular_file)
+  summary <- purrr::map(files, frk_summarise_tabular_file)
+  
+  # Rename elements of list
+  names(summary) <- files
+  
+  return(summary)
 }
