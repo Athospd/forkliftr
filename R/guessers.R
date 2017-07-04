@@ -9,7 +9,7 @@ guess_delim <- function(file, n_max = 10, verbose = FALSE) {
   
   # The candidates to be delims
   delims_ordered_by_probability <- lines %>%
-    purrr::map_df(~count_chars(.x), .id = "line") %>%  # Get char count for each line
+    purrr::map_df(~count_chars(.x), .id = "line") %>% # Get char count for each line
     dplyr::left_join(a_priori_delimiter_ranks, by = "char_raw") %>%
     dplyr::mutate(rank = dplyr::if_else(rank %>% is.na, 1, rank)) %>%
     dplyr::filter(rank > 0) %>% # Disconsider letters and numbers for delimiter candidates
@@ -85,6 +85,30 @@ guess_col_types <- function(file, n_max = 10, verbose = FALSE) {
   return(types)
 }
 
+# Guess quote character of a file
+guess_quote <- function(file, n_max = 10, verbose = FALSE) {
+  
+  # Read lines safely
+  lines <- safe_read(file, n_max = n_max)
+  
+  # The candidates to be delims
+  quotes_ordered_by_probability <- lines %>%
+    purrr::map_df(~count_chars(.x), .id = "line") %>%
+    dplyr::mutate(even = ifelse(count %% 2 == 0, TRUE, FALSE)) %>%
+    dplyr::filter(char_raw %in% c("22", "27") & even) %>%
+    dplyr::group_by(char_raw) %>%
+    dplyr::summarise(mean = mean(count)) %>%
+    dplyr::mutate(char = purrr::map_chr(char_raw, ~ .x %>% as.hexmode %>% as.raw %>% rawToChar)) %>%
+    dplyr::arrange(-mean)
+  
+  most_probable_quote <- quotes_ordered_by_probability$char[1]
+  
+  # Message delimiter found
+  if(verbose) message(sprintf("Most probable quote: '%s'", most_probable_quote))
+  
+  return(most_probable_quote)
+}
+
 # detect_first_row_with_content
 
 # detect_blank_lines
@@ -92,8 +116,6 @@ guess_col_types <- function(file, n_max = 10, verbose = FALSE) {
 # guess_locale
 
 # guess_na_string
-
-# guess_quote
 
 # guess_comment
 
@@ -112,12 +134,16 @@ frk_summarise_tabular_file <- function(file, n_max = 10, verbose = FALSE) {
   # Guess col types
   guessed_col_types = guess_col_types(file, n_max, verbose)
   
+  # Guess quote
+  guessed_quote = guess_quote(file, n_max, verbose)
+  
   return(list(
     file = file,
     guessed_delim = guessed_delim,
     guessed_encoding = guessed_encoding,
     guessed_has_header = guessed_has_header,
-    guessed_col_types = guessed_col_types
+    guessed_col_types = guessed_col_types,
+    guessed_quote = guessed_quote
   ))
 }
 
