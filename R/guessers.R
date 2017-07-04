@@ -1,20 +1,7 @@
-# Count char
-count_chars <- function(line) {
-  
-  # Create table with chars
-  t <- tibble::tibble(char_raw = charToRaw(line) %>% as.character)
-  
-  # Return counts
-  t %>% 
-    dplyr::count(char_raw) %>% 
-    dplyr::rename(count = n)
-}
-
 # Guess delimiter of a file
 guess_delim <- function(file, n_max = 10, verbose = FALSE) {
   
   # Read lines safely
-  safe_read <- purrr::possibly(readr::read_lines, NULL)
   lines <- safe_read(file, n_max = n_max)
   
   # A priori delimiter ranks (to deal with the ties)
@@ -58,7 +45,6 @@ guess_encoding <- function(file, verbose = FALSE) {
 guess_has_header <- function(file, n_max = 10, verbose = FALSE) {
   
   # Read lines safely
-  safe_read <- purrr::possibly(readr::read_lines, NULL)
   lines <- safe_read(file, n_max = n_max)
   
   # Get string distances
