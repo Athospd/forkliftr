@@ -2,7 +2,7 @@ library(tibble)
 library(dplyr)
 library(readr)
 
-context("guess_delim")
+context("guess_has_header")
 
 # Tiny table
 tiny <- tibble(
