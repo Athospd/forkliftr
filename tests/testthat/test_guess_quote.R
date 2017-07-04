@@ -22,6 +22,6 @@ test_that("guess_quote can guess from tiny tables", {
 })
 
 test_that("guess_quote can guess that there is no quote", {
-  expect_message(guess_quote(file_tiny_unquoted1, verbose = TRUE), "Most probable quote: '' (unquoted)")
+  expect_message(guess_quote(file_tiny_unquoted1, verbose = TRUE), "Most probable quote: '' (unquoted)\n")
   expect_identical(guess_quote(file_tiny_unquoted1), "")
 })
