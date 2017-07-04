@@ -67,7 +67,7 @@ guess_has_header <- function(file, n_max = 10, verbose = FALSE) {
   
   # Check whether header exists
   header <- w_header < wo_header*0.5
-    
+  
   # Message header found
   if(verbose & header) message("File probably has a header")
   else if (verbose & !header) message("File probably doesn't have a header")
@@ -78,9 +78,18 @@ guess_has_header <- function(file, n_max = 10, verbose = FALSE) {
 # Guess column types
 guess_col_types <- function(file, n_max = 10, verbose = FALSE) {
   
+  # Function to read file with guessed delimiter
+  read_with_guess <- function(file, n_max) {
+    delim <- guess_delim(file, n_max)$char[1]
+    readr::read_delim(file, delim, n_max = n_max)
+  }
+  
   # Get file column specification
-  if (verbose) read_file <- readr::read_csv(file, n_max = n_max)
-  else read_file <- suppressMessages(readr::read_csv(file, n_max = n_max))
+  if (verbose) {
+    read_file <- read_with_guess(file, n_max)
+  } else {
+    read_file <- suppressMessages(read_with_guess(file, n_max))
+  }
   col_spec <- attr(read_file, "spec")$cols
   
   # Get colum types
