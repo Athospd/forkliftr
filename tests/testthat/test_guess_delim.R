@@ -15,7 +15,7 @@ write_delim(tiny, file_tiny, ";")
 ans <- tibble(
   char_raw = c("3b", "2c"),
   var = c(0, 0),
-  n = c(2L, 2L),
+  n = c(3L, 2L),
   char = c(";", ","))
 
 # Large tables
