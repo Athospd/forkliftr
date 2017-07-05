@@ -12,3 +12,8 @@ count_chars <- function(line) {
 
 # Safely read lines
 safe_read <- purrr::possibly(readr::read_lines, NULL)
+
+# Convert vector of raws to chars
+raw_to_char <- function(raw) {
+  purrr::map_chr(raw, ~ .x %>% as.hexmode %>% as.raw %>% rawToChar)
+}

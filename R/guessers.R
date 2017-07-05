@@ -16,7 +16,7 @@ guess_delim <- function(file, n_max = 10, verbose = FALSE) {
     dplyr::group_by(rank, char_raw) %>% # Get chars with same count
     dplyr::summarise(var = var(count), n = n()) %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(char = purrr::map_chr(char_raw, ~ .x %>% as.hexmode %>% as.raw %>% rawToChar)) %>%
+    dplyr::mutate(char = raw_to_char(char_raw)) %>%
     dplyr::arrange(var, n %>% dplyr::desc(), rank %>% dplyr::desc(), char_raw) %>%
     dplyr::slice(1:10) %>%
     dplyr::select(-rank)
@@ -98,7 +98,7 @@ guess_quote <- function(file, n_max = 10, verbose = FALSE) {
     dplyr::filter(char_raw %in% c("22", "27") & even) %>%
     dplyr::group_by(char_raw) %>%
     dplyr::summarise(mean = mean(count)) %>%
-    dplyr::mutate(char = purrr::map_chr(char_raw, ~ .x %>% as.hexmode %>% as.raw %>% rawToChar)) %>%
+    dplyr::mutate(char = raw_to_char(char_raw)) %>%
     dplyr::arrange(-mean)
   
   most_probable_quote <- quotes_ordered_by_probability$char[1]
