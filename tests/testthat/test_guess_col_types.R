@@ -27,7 +27,7 @@ ans_large <- c(
 
 test_that("guess_col_types can guess from tiny tables", {
   expect_identical(guess_col_types(file_tiny), ans_tiny)
-  expect_message(guess_col_types(file_tiny, verbose = TRUE), "Parsed")
+  expect_message(guess_col_types(file_tiny, verbose = TRUE), "types")
 })
 
 test_that("guess_col_types can guess from large tables", {

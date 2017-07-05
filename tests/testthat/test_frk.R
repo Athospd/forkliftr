@@ -6,10 +6,10 @@ context("frk_summarise_tabular_file")
 
 # Tables to save
 tiny <- tibble(
-  a = c('asdf', 'fdsa'),
-  b = c(1.1, 0),
-  c = c('asdf', 3.0),
-  d = c(1, 2))
+  column1 = c('asdf', 'fdsa'),
+  column2 = c(1.1, 0),
+  column3 = c('asdf', 3.0),
+  column4 = c(1, 2))
 large <- as_tibble(nasa)
 
 # Create directory
@@ -32,8 +32,9 @@ ans <- list(
   file = file_tiny,
   guessed_delim = ",",
   guessed_encoding = "ASCII",
-  guessed_has_header = FALSE,
+  guessed_has_header = TRUE,
   guessed_col_types = c("character", "double", "character", "integer"),
+  guessed_col_names = c("column1", "column2", "column3", "column4"),
   guessed_quote = "\"",
   guessed_skip = 0,
   guessed_decimal_mark = ".",
@@ -47,5 +48,5 @@ test_that("frk_summarise_tabular_file outputs correctly", {
 
 test_that("frk_summarise_tabular_files outputs correctly", {
   expect_equal(length(frk_summarise_tabular_files(dir)), 5)
-  expect_equal(length(frk_summarise_tabular_files(dir)[[3]]), 9)
+  expect_equal(length(frk_summarise_tabular_files(dir)[[3]]), 10)
 })
