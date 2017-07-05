@@ -2,7 +2,7 @@
 guess_delim <- function(file, guess_max = 10, verbose = FALSE) {
   
   # Read lines safely
-  lines <- safe_read(file, n_max = guess_max)
+  lines <- safe_read(file, n_max = guess_max, skip = guess_skip(file, guess_max))
   
   # A priori delimiter ranks (to deal with the ties)
   utils::data("a_priori_delimiter_ranks", package = "forkliftr")
@@ -45,7 +45,7 @@ guess_encoding <- function(file, verbose = FALSE) {
 guess_has_header <- function(file, guess_max = 10, verbose = FALSE) {
   
   # Read lines safely
-  lines <- safe_read(file, n_max = guess_max)
+  lines <- safe_read(file, n_max = guess_max, skip = guess_skip(file, guess_max))
   
   # Get string distances
   w_header <- mean(stringdist::stringsim(lines[1], lines[2:length(lines)]))
@@ -67,7 +67,7 @@ guess_col_types <- function(file, guess_max = 10, verbose = FALSE) {
   # Function to read file with guessed delimiter
   read_with_guess <- function(file, guess_max) {
     delim <- guess_delim(file, guess_max)$char[1]
-    readr::read_delim(file, delim, n_max = guess_max)
+    readr::read_delim(file, delim, n_max = guess_max, skip = guess_skip(file, guess_max))
   }
   
   # Get file column specification
@@ -89,7 +89,7 @@ guess_col_types <- function(file, guess_max = 10, verbose = FALSE) {
 guess_quote <- function(file, guess_max = 10, verbose = FALSE) {
   
   # Read lines safely
-  lines <- safe_read(file, n_max = guess_max)
+  lines <- safe_read(file, n_max = guess_max, skip = guess_skip(file, guess_max))
   
   # The candidates to be delims
   quotes_ordered_by_probability <- lines %>%
@@ -114,7 +114,18 @@ guess_quote <- function(file, guess_max = 10, verbose = FALSE) {
   return(most_probable_quote)
 }
 
-# detect_first_row_with_content
+# Detects first row with content
+guess_skip <- function(file, guess_max = 10, verbose = FALSE) {
+  
+  # Detect first non-empty line
+  lines <- safe_read(file, n_max = guess_max)
+  skip = min(which(lines != "")) - 1
+  
+  # Messsage skip found
+  if (verbose) message(sprintf("File contents probably start at row: '%s'", skip))
+  
+  return(skip)
+}
 
 # detect_blank_lines
 
@@ -142,13 +153,17 @@ frk_summarise_tabular_file <- function(file, guess_max = 10, verbose = FALSE) {
   # Guess quote
   guessed_quote = guess_quote(file, guess_max, verbose)
   
+  #
+  guessed_skip <- guess_skip(file, guess_max, verbose)
+  
   return(list(
     file = file,
     guessed_delim = guessed_delim,
     guessed_encoding = guessed_encoding,
     guessed_has_header = guessed_has_header,
     guessed_col_types = guessed_col_types,
-    guessed_quote = guessed_quote
+    guessed_quote = guessed_quote,
+    guessed_skip = guessed_skip
   ))
 }
 
