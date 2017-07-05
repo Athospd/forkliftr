@@ -11,7 +11,7 @@ tiny <- c(
   "1|'as,df'|'asdf'|1.2",
   "2|'fd,df'|'0.1'|2.3",
   "3|'asdf'|'234'|4.5",
-  "3|'qwe,r'|'234'|4.5"
+  "4|'qwe,r'|'234'|4.5"
 )
 file_tiny <- tempfile()
 writeLines(tiny, file_tiny)

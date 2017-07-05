@@ -35,7 +35,9 @@ ans <- list(
   guessed_has_header = FALSE,
   guessed_col_types = c("character", "double", "character", "integer"),
   guessed_quote = "\"",
-  guessed_skip = 0
+  guessed_skip = 0,
+  guessed_decimal_mark = ".",
+  guessed_grouping_mark = ","
 )
 
 test_that("frk_summarise_tabular_file outputs correctly", {
@@ -45,5 +47,5 @@ test_that("frk_summarise_tabular_file outputs correctly", {
 
 test_that("frk_summarise_tabular_files outputs correctly", {
   expect_equal(length(frk_summarise_tabular_files(dir)), 5)
-  expect_equal(length(frk_summarise_tabular_files(dir)[[3]]), 7)
+  expect_equal(length(frk_summarise_tabular_files(dir)[[3]]), 9)
 })

@@ -64,12 +64,6 @@ guess_has_header <- function(file, guess_max = 10, verbose = FALSE) {
 # Guess column types
 guess_col_types <- function(file, guess_max = 10, verbose = FALSE) {
   
-  # Function to read file with guessed delimiter
-  read_with_guess <- function(file, guess_max) {
-    delim <- guess_delim(file, guess_max)$char[1]
-    readr::read_delim(file, delim, n_max = guess_max, skip = guess_skip(file, guess_max))
-  }
-  
   # Get file column specification
   if (verbose) {
     read_file <- read_with_guess(file, guess_max)
@@ -114,7 +108,7 @@ guess_quote <- function(file, guess_max = 10, verbose = FALSE) {
   return(most_probable_quote)
 }
 
-# Detects first row with content
+# Guesses how many lines to skip
 guess_skip <- function(file, guess_max = 10, verbose = FALSE) {
   
   # Detect first non-empty line
@@ -127,13 +121,82 @@ guess_skip <- function(file, guess_max = 10, verbose = FALSE) {
   return(skip)
 }
 
-# detect_blank_lines
+# Guess decimal mark
+guess_decimal_mark <- function(file, guess_max = 10, verbose = FALSE) {
+  
+  # Function to filter lines given a quote
+  filter_lines <- function(lines, quote) {
+    if (quote == "") {
+      lines
+    } else {
+      lines <- lines[!stringr::str_detect(lines, quote)]
+    }
+    return(lines)
+  }
+  
+  # Read lines safely
+  lines <- safe_read(file, n_max = guess_max, skip = guess_skip(file, guess_max) + 1)
+  
+  # Get delim and quote (escaped)
+  delim <- guess_delim(file, guess_max)$char[1] %>%
+    stringr::str_replace_all("(\\W)", "\\\\\\1")
+  quote <- guess_quote(file, guess_max) %>%
+    stringr::str_replace_all("(\\W)", "\\\\\\1")
+
+  # Compute stats for each mark
+  stats <- lines %>%
+    stringr::str_split(delim) %>%
+    purrr::flatten_chr() %>%
+    filter_lines(quote) %>%
+    tibble::tibble(char = .) %>%
+    dplyr::mutate(
+      comma = stringr::str_count(char, "[0-9],"),
+      period = stringr::str_count(char, "[0-9]\\."),
+      comma_g1 = comma > 1,
+      period_g1 = period > 1
+    ) %>%
+    dplyr::summarise(
+      comma = sum(comma), period = sum(period),
+      comma_g1 = any(comma_g1), period_g1 = any(period_g1)
+    )
+
+  # Determine mark
+  if ((stats$comma > 0 & !stats$comma_g1) | stats$period == 0 | stats$period_g1) {
+    decimal_mark <- ","
+  } else {
+    decimal_mark <- "."
+  }
+  
+  # Message mark found
+  if (verbose) message(sprintf("Most probable decimal mark: '%s'", decimal_mark))
+  
+  return(decimal_mark)
+}
+
+# Guess grouping mark
+guess_grouping_mark <- function(file, guess_max = 10, verbose = FALSE) {
+  
+  # Guess decimal mark
+  decimal_mark <- guess_decimal_mark(file, guess_max)
+  if (decimal_mark == ".") {
+    grouping_mark <- ","
+  } else {
+    grouping_mark <- "."
+  }
+  
+  # Message mark found
+  if (verbose) message(sprintf("Most probable grouping mark: '%s'", grouping_mark))
+  
+  return(grouping_mark)
+}
 
 # guess_locale
 
 # guess_na_string
 
 # guess_comment
+
+# detect_blank_lines
 
 # Detect and return a tabular file configuration
 frk_summarise_tabular_file <- function(file, guess_max = 10, verbose = FALSE) {
@@ -153,8 +216,12 @@ frk_summarise_tabular_file <- function(file, guess_max = 10, verbose = FALSE) {
   # Guess quote
   guessed_quote = guess_quote(file, guess_max, verbose)
   
-  #
+  # Guess lines to skip
   guessed_skip <- guess_skip(file, guess_max, verbose)
+  
+  # Guess decimal and grouping marks
+  guessed_decimal_mark <- guess_decimal_mark(file, guess_max, verbose)
+  guessed_grouping_mark <- guess_grouping_mark(file, guess_max, verbose)
   
   return(list(
     file = file,
@@ -163,7 +230,9 @@ frk_summarise_tabular_file <- function(file, guess_max = 10, verbose = FALSE) {
     guessed_has_header = guessed_has_header,
     guessed_col_types = guessed_col_types,
     guessed_quote = guessed_quote,
-    guessed_skip = guessed_skip
+    guessed_skip = guessed_skip,
+    guessed_decimal_mark = guessed_decimal_mark,
+    guessed_grouping_mark = guessed_grouping_mark
   ))
 }
 
