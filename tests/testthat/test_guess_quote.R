@@ -17,11 +17,11 @@ write.csv(tiny, file_tiny_unquoted1, quote = FALSE)
 
 test_that("guess_quote can guess from tiny tables", {
   expect_identical(guess_quote(file_tiny1), "\"")
-  expect_true(is.na(guess_quote(file_tiny2)))
-  expect_message(guess_quote(file_tiny, verbose = TRUE), "probable")
+  expect_identical(guess_quote(file_tiny2), "")
+  expect_message(guess_quote(file_tiny1, verbose = TRUE), "probable")
 })
 
 test_that("guess_quote can guess that there is no quote", {
-  expect_message(guess_quote(file_tiny_unquoted1, verbose = TRUE), "Most probable quote: '' (unquoted)\n")
+  expect_message(guess_quote(file_tiny_unquoted1, verbose = TRUE), "unquoted")
   expect_identical(guess_quote(file_tiny_unquoted1), "")
 })
