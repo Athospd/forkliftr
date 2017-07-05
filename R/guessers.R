@@ -12,12 +12,12 @@ guess_delim <- function(file, n_max = 10, verbose = FALSE) {
     purrr::map_df(~count_chars(.x), .id = "line") %>% # Get char count for each line
     dplyr::left_join(a_priori_delimiter_ranks, by = "char_raw") %>%
     dplyr::mutate(rank = dplyr::if_else(rank %>% is.na, 1, rank)) %>%
-    dplyr::filter(rank > 0) %>% # Disconsider letters and numbers for delimiter candidates
+    dplyr::filter(rank > 0) %>% # Disconsider letters and numbers as candidates
     dplyr::group_by(rank, char_raw) %>% # Get chars with same count
     dplyr::summarise(var = var(count), n = n()) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(char = raw_to_char(char_raw)) %>%
-    dplyr::arrange(var, n %>% dplyr::desc(), rank %>% dplyr::desc(), char_raw) %>%
+    dplyr::arrange(var, -n, -rank, char_raw) %>%
     dplyr::slice(1:10) %>%
     dplyr::select(-rank)
   
@@ -105,8 +105,11 @@ guess_quote <- function(file, n_max = 10, verbose = FALSE) {
   most_probable_quote <- ifelse(is.na(most_probable_quote), "", most_probable_quote) 
   
   # Message delimiter found
-  if(verbose & most_probable_quote != "") message(sprintf("Most probable quote: '%s'", most_probable_quote))
-  if(verbose & most_probable_quote == "") message("Most probable quote: '' (unquoted)")
+  if(verbose & most_probable_quote != "") {
+    message(sprintf("Most probable quote: '%s'", most_probable_quote))
+  } else if(verbose & most_probable_quote == "") {
+    message("Most probable quote: '' (unquoted)")
+  }
   
   return(most_probable_quote)
 }
