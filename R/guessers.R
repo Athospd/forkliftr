@@ -1,8 +1,8 @@
 # Guess delimiter of a file
-guess_delim <- function(file, n_max = 10, verbose = FALSE) {
+guess_delim <- function(file, guess_max = 10, verbose = FALSE) {
   
   # Read lines safely
-  lines <- safe_read(file, n_max = n_max)
+  lines <- safe_read(file, n_max = guess_max)
   
   # A priori delimiter ranks (to deal with the ties)
   utils::data("a_priori_delimiter_ranks", package = "forkliftr")
@@ -38,14 +38,14 @@ guess_encoding <- function(file, verbose = FALSE) {
   # Message encoding found
   if(verbose) message(sprintf("Most probable encoding: '%s'", encoding))
   
-  return(encoding)
+  return(readr::guess_encoding(file))
 }
 
 # Guess whether file has header
-guess_has_header <- function(file, n_max = 10, verbose = FALSE) {
+guess_has_header <- function(file, guess_max = 10, verbose = FALSE) {
   
   # Read lines safely
-  lines <- safe_read(file, n_max = n_max)
+  lines <- safe_read(file, n_max = guess_max)
   
   # Get string distances
   w_header <- mean(stringdist::stringsim(lines[1], lines[2:length(lines)]))
@@ -62,19 +62,19 @@ guess_has_header <- function(file, n_max = 10, verbose = FALSE) {
 }
 
 # Guess column types
-guess_col_types <- function(file, n_max = 10, verbose = FALSE) {
+guess_col_types <- function(file, guess_max = 10, verbose = FALSE) {
   
   # Function to read file with guessed delimiter
-  read_with_guess <- function(file, n_max) {
-    delim <- guess_delim(file, n_max)$char[1]
-    readr::read_delim(file, delim, n_max = n_max)
+  read_with_guess <- function(file, guess_max) {
+    delim <- guess_delim(file, guess_max)$char[1]
+    readr::read_delim(file, delim, n_max = guess_max)
   }
   
   # Get file column specification
   if (verbose) {
-    read_file <- read_with_guess(file, n_max)
+    read_file <- read_with_guess(file, guess_max)
   } else {
-    read_file <- suppressMessages(read_with_guess(file, n_max))
+    read_file <- suppressMessages(read_with_guess(file, guess_max))
   }
   col_spec <- attr(read_file, "spec")$cols
   
@@ -86,10 +86,10 @@ guess_col_types <- function(file, n_max = 10, verbose = FALSE) {
 }
 
 # Guess quote character of a file
-guess_quote <- function(file, n_max = 10, verbose = FALSE) {
+guess_quote <- function(file, guess_max = 10, verbose = FALSE) {
   
   # Read lines safely
-  lines <- safe_read(file, n_max = n_max)
+  lines <- safe_read(file, n_max = guess_max)
   
   # The candidates to be delims
   quotes_ordered_by_probability <- lines %>%
@@ -125,22 +125,22 @@ guess_quote <- function(file, n_max = 10, verbose = FALSE) {
 # guess_comment
 
 # Detect and return a tabular file configuration
-frk_summarise_tabular_file <- function(file, n_max = 10, verbose = FALSE) {
+frk_summarise_tabular_file <- function(file, guess_max = 10, verbose = FALSE) {
   
   # Guess delim
-  guessed_delim = guess_delim(file, n_max, verbose)$char[1]
+  guessed_delim = guess_delim(file, guess_max, verbose)$char[1]
   
   # Guess encoding
-  guessed_encoding = guess_encoding(file, verbose)
+  guessed_encoding = guess_encoding(file, verbose)$encoding[1]
   
   # Guess has header
-  guessed_has_header = guess_has_header(file, n_max, verbose)
+  guessed_has_header = guess_has_header(file, guess_max, verbose)
   
   # Guess col types
-  guessed_col_types = guess_col_types(file, n_max, verbose)
+  guessed_col_types = guess_col_types(file, guess_max, verbose)
   
   # Guess quote
-  guessed_quote = guess_quote(file, n_max, verbose)
+  guessed_quote = guess_quote(file, guess_max, verbose)
   
   return(list(
     file = file,
