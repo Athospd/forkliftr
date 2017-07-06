@@ -111,6 +111,8 @@ guess_quote <- function(file, guess_max = 10, verbose = FALSE) {
 # Guesses how many lines to skip
 guess_skip <- function(file, guess_max = 10, verbose = FALSE) {
   
+  # Guess if file has header
+  
   # Detect first non-empty line
   lines <- safe_read(file, n_max = guess_max)
   skip = min(which(lines != "")) - 1
