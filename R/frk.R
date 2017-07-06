@@ -1,5 +1,5 @@
 # Detect and return a tabular file configuration
-frk_summarise_tabular_file <- function(file, guess_max = 10, verbose = FALSE) {
+frk_summarise_ <- function(file, guess_max = 10, verbose = FALSE) {
   
   # Guess delim
   guessed_delim = guess_delim(file, guess_max, verbose)$char[1]
@@ -41,11 +41,16 @@ frk_summarise_tabular_file <- function(file, guess_max = 10, verbose = FALSE) {
 }
 
 # Detect and return all tabular files configurations from a directory
-frk_summarise_tabular_files <- function(path) {
+frk_summarise <- function(files, guess_max = 10, verbose = FALSE) {
+  
+  # Handle verbose
+  if (length(files) > 1 & verbose) {
+    warning("Only use verbose = TRUE when summarizing one file")
+    verbose <- FALSE
+  }
   
   # Get summary for all files
-  files <- list.files(path, full.names = TRUE)
-  summary <- purrr::map(files, frk_summarise_tabular_file)
+  summary <- purrr::map(files, ~frk_summarise_(.x, guess_max, verbose))
   
   # Rename elements of list
   names(summary) <- files

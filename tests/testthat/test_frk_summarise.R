@@ -2,7 +2,7 @@ library(tibble)
 library(dplyr)
 library(readr)
 
-context("frk_summarise_tabular_file")
+context("frk_summarise")
 
 # Tables to save
 tiny <- tibble(
@@ -27,8 +27,11 @@ write.table(large, file_large2, sep = ",", col.names = TRUE, row.names = FALSE)
 write.table(large, file_large3, sep = "|", col.names = FALSE, row.names = FALSE)
 write.table(large, file_large4, sep = "\t", col.names = TRUE, row.names = FALSE)
 
+# All files
+dir <- c(file_tiny, file_large1, file_large2, file_large3, file_large4)
+
 # Output of frk_summarise_tabular_file
-ans <- list(
+ans <- list(list(
   file = file_tiny,
   guessed_delim = ",",
   guessed_encoding = "ASCII",
@@ -39,14 +42,15 @@ ans <- list(
   guessed_skip = 0,
   guessed_decimal_mark = ".",
   guessed_grouping_mark = ","
-)
+))
+names(ans) <- file_tiny
 
-test_that("frk_summarise_tabular_file outputs correctly", {
-  expect_identical(frk_summarise_tabular_file(file_tiny), ans)
-  expect_message(frk_summarise_tabular_file(file_tiny, verbose = TRUE))
+test_that("frk_summarise works with one file", {
+  expect_identical(frk_summarise(file_tiny), ans)
+  expect_message(frk_summarise(file_tiny, verbose = TRUE))
 })
 
 test_that("frk_summarise_tabular_files outputs correctly", {
-  expect_equal(length(frk_summarise_tabular_files(dir)), 5)
-  expect_equal(length(frk_summarise_tabular_files(dir)[[3]]), 10)
+  expect_equal(length(frk_summarise(dir)), 5)
+  expect_equal(length(frk_summarise(dir)[[3]]), 10)
 })
