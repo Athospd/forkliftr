@@ -65,18 +65,70 @@ guess_has_header <- function(file, guess_max = 10, verbose = FALSE) {
 guess_col_types <- function(file, guess_max = 10, verbose = FALSE) {
   
   # Get file column specification
-  if (verbose) {
-    read_file <- read_with_guess(file, guess_max)
-  } else {
-    read_file <- suppressMessages(read_with_guess(file, guess_max))
-  }
+  read_file <- suppressMessages(read_with_guess(file, guess_max))
   col_spec <- attr(read_file, "spec")$cols
   
   # Get colum types
   collectors <- purrr::map_chr(col_spec, ~attr(.x, "class")[1])
   types <- stringr::str_replace(collectors, "collector_", "")
   
+  # Message header
+  if (verbose) {
+    
+    # Create output string
+    string <- stringr::str_c(types, collapse = ", ")
+    string <- stringr::str_trunc(string, 50)
+    
+    # Print message
+    message(sprintf("Column types: %s", string))
+  }
+  
   return(types)
+}
+
+# Guess names of columns
+guess_col_names <- function(file, guess_max = 10, verbose = FALSE) {
+  
+  # Remove quotes in string
+  remove_with_quote <- function(string, quote) {
+    if (quote != "") {
+      string <- stringr::str_replace_all(string, quote, "")
+    }
+    return(string)
+  }
+  
+  # Get delim (escaped)
+  delim <- guess_delim(file, guess_max)$char[1] %>%
+    stringr::str_replace_all("(\\W)", "\\\\\\1")
+  quote <- guess_quote(file, guess_max) %>%
+    stringr::str_replace_all("(\\W)", "\\\\\\1")
+  
+  # Read lines safely
+  if (guess_has_header(file, guess_max)) {
+    header <- file %>%
+      safe_read(n_max = 1, skip = guess_skip(file, guess_max)) %>%
+      remove_with_quote(quote)
+    header <- stringr::str_split(header, delim)[[1]]
+  } else {
+    header <- ""
+  }
+  
+  # Message header
+  if (verbose & header != "") {
+    
+    # Create output string
+    string <- stringr::str_c(header, collapse = ", ")
+    string <- stringr::str_trunc(string, 50)
+    
+    # Print message
+    message(sprintf("Column names: %s", string))
+  } else if (verbose & header == "") {
+    
+    # Print message
+    message("File probably doesn't have a header")
+  }
+  
+  return(header)
 }
 
 # Guess quote character of a file
@@ -215,6 +267,9 @@ frk_summarise_tabular_file <- function(file, guess_max = 10, verbose = FALSE) {
   # Guess col types
   guessed_col_types = guess_col_types(file, guess_max, verbose)
   
+  # Gues col names
+  guessed_col_names = guess_col_names(file, guess_max, verbose)
+  
   # Guess quote
   guessed_quote = guess_quote(file, guess_max, verbose)
   
@@ -231,6 +286,7 @@ frk_summarise_tabular_file <- function(file, guess_max = 10, verbose = FALSE) {
     guessed_encoding = guessed_encoding,
     guessed_has_header = guessed_has_header,
     guessed_col_types = guessed_col_types,
+    guessed_col_names = guessed_col_names,
     guessed_quote = guessed_quote,
     guessed_skip = guessed_skip,
     guessed_decimal_mark = guessed_decimal_mark,
