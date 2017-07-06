@@ -28,15 +28,15 @@ frk_summarise_ <- function(file, guess_max = 10, verbose = FALSE) {
   
   return(list(
     file = file,
-    guessed_delim = guessed_delim,
-    guessed_encoding = guessed_encoding,
-    guessed_has_header = guessed_has_header,
-    guessed_col_types = guessed_col_types,
-    guessed_col_names = guessed_col_names,
-    guessed_quote = guessed_quote,
-    guessed_skip = guessed_skip,
-    guessed_decimal_mark = guessed_decimal_mark,
-    guessed_grouping_mark = guessed_grouping_mark
+    delim = guessed_delim,
+    encoding = guessed_encoding,
+    has_header = guessed_has_header,
+    col_types = guessed_col_types,
+    col_names = guessed_col_names,
+    quote = guessed_quote,
+    skip = guessed_skip,
+    decimal_mark = guessed_decimal_mark,
+    grouping_mark = guessed_grouping_mark
   ))
 }
 

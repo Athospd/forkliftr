@@ -33,15 +33,15 @@ dir <- c(file_tiny, file_large1, file_large2, file_large3, file_large4)
 # Output of frk_summarise_tabular_file
 ans <- list(list(
   file = file_tiny,
-  guessed_delim = ",",
-  guessed_encoding = "ASCII",
-  guessed_has_header = TRUE,
-  guessed_col_types = c("character", "double", "character", "integer"),
-  guessed_col_names = c("column1", "column2", "column3", "column4"),
-  guessed_quote = "\"",
-  guessed_skip = 0,
-  guessed_decimal_mark = ".",
-  guessed_grouping_mark = ","
+  delim = ",",
+  encoding = "ASCII",
+  has_header = TRUE,
+  col_types = c("character", "double", "character", "integer"),
+  col_names = c("column1", "column2", "column3", "column4"),
+  quote = "\"",
+  skip = 0,
+  decimal_mark = ".",
+  grouping_mark = ","
 ))
 names(ans) <- file_tiny
 
@@ -50,7 +50,7 @@ test_that("frk_summarise works with one file", {
   expect_message(frk_summarise(file_tiny, verbose = TRUE))
 })
 
-test_that("frk_summarise_tabular_files outputs correctly", {
+test_that("frk_summarise works with more than one file", {
   expect_equal(length(frk_summarise(dir)), 5)
   expect_equal(length(frk_summarise(dir)[[3]]), 10)
 })
