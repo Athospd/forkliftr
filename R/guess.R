@@ -36,7 +36,7 @@ guess_encoding <- function(file, verbose = FALSE) {
   encoding <- readr::guess_encoding(file)$encoding[1]
   
   # Message encoding found
-  if(verbose) message(sprintf("Most probable encoding: '%s'", encoding))
+  if(verbose) message(sprintf("Most probable encoding: %s", encoding))
   
   return(readr::guess_encoding(file))
 }
@@ -114,7 +114,7 @@ guess_col_names <- function(file, guess_max = 10, verbose = FALSE) {
   }
   
   # Message header
-  if (verbose & header != "") {
+  if (verbose & any(header != "")) {
     
     # Create output string
     string <- stringr::str_c(header, collapse = ", ")
@@ -122,7 +122,7 @@ guess_col_names <- function(file, guess_max = 10, verbose = FALSE) {
     
     # Print message
     message(sprintf("Column names: %s", string))
-  } else if (verbose & header == "") {
+  } else if (verbose & all(header == "")) {
     
     # Print message
     message("File probably doesn't have a header")
@@ -168,7 +168,7 @@ guess_skip <- function(file, guess_max = 10, verbose = FALSE) {
   skip = min(which(lines != "")) - 1
   
   # Messsage skip found
-  if (verbose) message(sprintf("File contents probably start at row: '%s'", skip))
+  if (verbose) message(sprintf("File contents probably start at row: %s", skip))
   
   return(skip)
 }
@@ -240,67 +240,4 @@ guess_grouping_mark <- function(file, guess_max = 10, verbose = FALSE) {
   if (verbose) message(sprintf("Most probable grouping mark: '%s'", grouping_mark))
   
   return(grouping_mark)
-}
-
-# guess_locale
-
-# guess_na_string
-
-# guess_comment
-
-# detect_blank_lines
-
-# Detect and return a tabular file configuration
-frk_summarise_tabular_file <- function(file, guess_max = 10, verbose = FALSE) {
-  
-  # Guess delim
-  guessed_delim = guess_delim(file, guess_max, verbose)$char[1]
-  
-  # Guess encoding
-  guessed_encoding = guess_encoding(file, verbose)$encoding[1]
-  
-  # Guess has header
-  guessed_has_header = guess_has_header(file, guess_max, verbose)
-  
-  # Guess col types
-  guessed_col_types = guess_col_types(file, guess_max, verbose)
-  
-  # Gues col names
-  guessed_col_names = guess_col_names(file, guess_max, verbose)
-  
-  # Guess quote
-  guessed_quote = guess_quote(file, guess_max, verbose)
-  
-  # Guess lines to skip
-  guessed_skip <- guess_skip(file, guess_max, verbose)
-  
-  # Guess decimal and grouping marks
-  guessed_decimal_mark <- guess_decimal_mark(file, guess_max, verbose)
-  guessed_grouping_mark <- guess_grouping_mark(file, guess_max, verbose)
-  
-  return(list(
-    file = file,
-    guessed_delim = guessed_delim,
-    guessed_encoding = guessed_encoding,
-    guessed_has_header = guessed_has_header,
-    guessed_col_types = guessed_col_types,
-    guessed_col_names = guessed_col_names,
-    guessed_quote = guessed_quote,
-    guessed_skip = guessed_skip,
-    guessed_decimal_mark = guessed_decimal_mark,
-    guessed_grouping_mark = guessed_grouping_mark
-  ))
-}
-
-# Detect and return all tabular files configurations from a directory
-frk_summarise_tabular_files <- function(path) {
-  
-  # Get summary for all files
-  files <- list.files(path, full.names = TRUE)
-  summary <- purrr::map(files, frk_summarise_tabular_file)
-  
-  # Rename elements of list
-  names(summary) <- files
-  
-  return(summary)
 }
