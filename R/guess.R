@@ -30,7 +30,7 @@ guess_delim <- function(file, guess_max = 10, verbose = FALSE) {
 }
 
 # Guess encoding of a file
-guess_encoding <- function(file, verbose = FALSE) {
+guess_encoding <- function(file, guess_max = 10, verbose = FALSE) {
   
   # Guess encoding
   encoding <- readr::guess_encoding(file)$encoding[1]
@@ -125,7 +125,7 @@ guess_col_names <- function(file, guess_max = 10, verbose = FALSE) {
   } else if (verbose & all(header == "")) {
     
     # Print message
-    message("File probably doesn't have a header")
+    message("File probably doesn't have column names")
   }
   
   return(header)

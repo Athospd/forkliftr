@@ -57,3 +57,32 @@ frk_summarise <- function(files, guess_max = 10, verbose = FALSE) {
   
   return(summary)
 }
+
+# Wrapper around read_delim that guesses the main arguments
+frk_read <- function(file,
+                     delim = guess_delim(file, guess_max)$char[1],
+                     quote = guess_quote(file, guess_max),
+                     escape_backslash = FALSE,
+                     escape_double = TRUE,
+                     col_names = guess_has_header(file, guess_max),
+                     col_types = NULL,
+                     locale = readr::locale(
+                       encoding = guess_encoding(file, guess_max)$encoding[1],
+                       decimal_mark = guess_decimal_mark(file, guess_max),
+                       grouping_mark = guess_grouping_mark(file, guess_max)),
+                     na = c("", "NA"),
+                     quoted_na = TRUE,
+                     comment = "",
+                     trim_ws = TRUE,
+                     skip = guess_skip(file, guess_max),
+                     n_max = Inf,
+                     guess_max = min(10, n_max)) {
+  
+  # Use read delim with new arguments
+  out <- readr::read_delim(
+    file, delim, quote, escape_backslash, escape_double,
+    col_names, col_types, locale, na, quoted_na, comment,
+    trim_ws, skip, n_max, guess_max)
+  
+  return(out)
+}
