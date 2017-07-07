@@ -35,7 +35,7 @@
 #' 
 #' @examples
 #' \dontrun{
-#' # Create sample files
+#' # Create sample file
 #' file <- tempfile()
 #' write.table(
 #'   dplyr::storms, file, sep = "|", dec = ",",

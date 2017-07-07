@@ -59,7 +59,7 @@ write.table(
 
 # Read file
 tbl <- frk_read(file)
-glimpse(file)
+glimpse(tbl)
 }
 
 }

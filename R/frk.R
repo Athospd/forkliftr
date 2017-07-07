@@ -130,7 +130,7 @@ frk_summarise_ <- function(file, guess_max = 10, verbose = FALSE) {
 #' 
 #' # Read file
 #' tbl <- frk_read(file)
-#' glimpse(file)
+#' glimpse(tbl)
 #' }
 #' 
 #' @export
