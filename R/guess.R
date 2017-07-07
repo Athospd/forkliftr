@@ -1,4 +1,55 @@
-# Guess delimiter of a file
+#' Guess structural characteristic of a flat file
+#' 
+#' @description
+#' The `guess` family of functions helps you figure out certain
+#' structural characteristics of flat files without you having
+#' to open the file and examine it manually.
+#' 
+#' What each specific function does can usually be found out by
+#' taking a look at the corresponding [readr::read_delim()] argument or
+#' by running `?guess_*` and reading the "Details" section.
+#' 
+#' @details
+#' Here is a list of all currently available `guess` functions and their respective
+#' descriptions:
+#' - [guess_col_names()]: guesses the column names (if the file has a header)
+#' - [guess_col_types()]: guesses the column types
+#' - [guess_decimal_mark()]: guesses the decimal mark used in the file
+#' - [guess_delim()]: guesses the file's delimiter
+#' - [guess_encoding()]: guesses the file's encoding
+#' - [guess_grouping_mark()]: guesses the grouping/thousands mark used in the file
+#' - [guess_has_header()]: gusses whether the file has column names
+#' - [guess_quote()]: gusses the character used to quote strings (if strings are quoted)
+#' - [guess_skip()]: guesses how many blank lines are at the beginning of the file
+#' 
+#' @param file Path to file
+#' @param guess_max Maximum number of records to use for guess
+#' @param verbose Whether to output guess as message
+#' @return All `guess` functions return an object that can be used as
+#' it's appropriate argument in [readr::read_delim()] or [readr::locale()]
+#' 
+#' @seealso [readr::read_delim()], [readr::locale()]
+#' 
+#' @name guess
+#' @family guess variants
+#' 
+#' @examples
+#' \dontrun{
+#' # Create sample files
+#' file <- tempfile()
+#' write.table(
+#'   dplyr::storms, file, sep = "|", dec = ",",
+#'   col.names = TRUE, row.names = FALSE)
+#'   
+#' # Run some guesses independetly
+#' guess_delim(file)
+#' guess_decimal_mark(file)
+#' guess_col_names(file)
+#' }
+NULL
+
+#' @rdname guess
+#' @export
 guess_delim <- function(file, guess_max = 10, verbose = FALSE) {
   
   # Read lines safely
@@ -29,7 +80,8 @@ guess_delim <- function(file, guess_max = 10, verbose = FALSE) {
   return(delims_ordered_by_probability)
 }
 
-# Guess encoding of a file
+#' @rdname guess
+#' @export
 guess_encoding <- function(file, guess_max = 10, verbose = FALSE) {
   
   # Guess encoding
@@ -41,7 +93,8 @@ guess_encoding <- function(file, guess_max = 10, verbose = FALSE) {
   return(readr::guess_encoding(file))
 }
 
-# Guess whether file has header
+#' @rdname guess
+#' @export
 guess_has_header <- function(file, guess_max = 10, verbose = FALSE) {
   
   # Read lines safely
@@ -61,7 +114,8 @@ guess_has_header <- function(file, guess_max = 10, verbose = FALSE) {
   return(header)
 }
 
-# Guess column types
+#' @rdname guess
+#' @export
 guess_col_types <- function(file, guess_max = 10, verbose = FALSE) {
   
   # Get file column specification
@@ -86,7 +140,8 @@ guess_col_types <- function(file, guess_max = 10, verbose = FALSE) {
   return(types)
 }
 
-# Guess names of columns
+#' @rdname guess
+#' @export
 guess_col_names <- function(file, guess_max = 10, verbose = FALSE) {
   
   # Remove quotes in string
@@ -131,7 +186,8 @@ guess_col_names <- function(file, guess_max = 10, verbose = FALSE) {
   return(header)
 }
 
-# Guess quote character of a file
+#' @rdname guess
+#' @export
 guess_quote <- function(file, guess_max = 10, verbose = FALSE) {
   
   # Read lines safely
@@ -160,7 +216,8 @@ guess_quote <- function(file, guess_max = 10, verbose = FALSE) {
   return(most_probable_quote)
 }
 
-# Guesses how many lines to skip
+#' @rdname guess
+#' @export
 guess_skip <- function(file, guess_max = 10, verbose = FALSE) {
   
   # Guess if file has header
@@ -175,7 +232,8 @@ guess_skip <- function(file, guess_max = 10, verbose = FALSE) {
   return(skip)
 }
 
-# Guess decimal mark
+#' @rdname guess
+#' @export
 guess_decimal_mark <- function(file, guess_max = 10, verbose = FALSE) {
   
   # Function to filter lines given a quote
@@ -227,7 +285,8 @@ guess_decimal_mark <- function(file, guess_max = 10, verbose = FALSE) {
   return(decimal_mark)
 }
 
-# Guess grouping mark
+#' @rdname guess
+#' @export
 guess_grouping_mark <- function(file, guess_max = 10, verbose = FALSE) {
   
   # Guess decimal mark

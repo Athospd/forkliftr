@@ -1,4 +1,6 @@
-# Count char
+#' Auxiliar function to count characters in a line
+#' 
+#' @param line A string of characters
 count_chars <- function(line) {
   
   # Create table with chars
@@ -10,18 +12,28 @@ count_chars <- function(line) {
     dplyr::rename(count = n)
 }
 
-# Safely read lines
+#' Auxiliar function to safely read lines
+#' 
+#' @param ... Arguments passed on to [readr::read_lines()]
 safe_read <- purrr::possibly(readr::read_lines, NULL)
 
-# Convert vector of raws to chars
+#' Auxiliar function to convert vector of raws to chars
+#' 
+#' @param raw Vector of raw characters
 raw_to_char <- function(raw) {
   purrr::map_chr(raw, ~ .x %>% as.hexmode %>% as.raw %>% rawToChar)
 }
 
-# Read file with guessed delimiter and skip
+#' Auxiliar function to read file while guessing delimiter and skip
+#' 
+#' @param file Path to file
+#' @param guess_max Maximum number of records to use for guesses
 read_with_guess <- function(file, guess_max) {
+  
+  # Guess delim and skip
   delim <- guess_delim(file, guess_max)$char[1]
   skip <- guess_skip(file, guess_max)
   
+  # Read file
   readr::read_delim(file, delim, n_max = guess_max, skip = skip)
 }

@@ -2,6 +2,7 @@
 #' @export
 magrittr::`%>%`
 
+# Get rid of spurious NOTEs
 globalVariables(c(
   "char_raw", "count", "n", "var",
   "a_priori_delimiter_ranks", "even",

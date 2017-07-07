@@ -18,5 +18,6 @@ Imports:
     stringdist,
     stringr,
     magrittr
-RoxygenNote: 6.0.1
 Suggests: testthat
+RoxygenNote: 6.0.1
+Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))
