@@ -20,12 +20,12 @@ To install forkliftr simply run the code bellow:
 
 ```r
 # install.packages("devtools")
-devtools::install_github("tidyverse/dplyr")
+devtools::install_github("Athospd/forkliftr")
 ```
 
 ## Usage
 
-Every `guess` function looks basically the same: it's arguments are the path to a
+Every `guess` function looks basically the same: its arguments are the path to a
 file, the maximum number of records to consider when making the guess, and whether
 to print a message with the result. To learn more about this family of functions
 simply run `?guess`.
