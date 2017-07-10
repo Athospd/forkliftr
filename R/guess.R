@@ -82,15 +82,23 @@ guess_delim <- function(file, guess_max = 10, verbose = FALSE) {
 
 #' @rdname guess
 #' @export
-guess_encoding <- function(file, guess_max = 10, verbose = FALSE) {
+guess_encoding <- function(file, guess_max = 10, default_enc_if_fail = "UTF-8", verbose = FALSE) {
   
   # Guess encoding
-  encoding <- readr::guess_encoding(file)$encoding[1]
+  encoding <- readr::guess_encoding(file, n_max = guess_max, threshold = 0.1)$encoding[1]
+  
+  # If readr::guess_encoding has no clue about the encoding, we assume that it is
+  if(is.na(encoding)) {
+    encoding <- default_enc_if_fail
+    msg <- sprintf("Unable to guess encoding. Using the default encoding %s.", default_enc_if_fail)
+  } else {
+    msg <- sprintf("Most probable encoding: %s", encoding)
+  }
   
   # Message encoding found
-  if(verbose) message(sprintf("Most probable encoding: %s", encoding))
+  if(verbose) message(msg)
   
-  return(readr::guess_encoding(file))
+  return(encoding)
 }
 
 #' @rdname guess
