@@ -107,6 +107,8 @@ guess_has_header <- function(file, guess_max = 10, verbose = FALSE) {
   # Read lines safely
   lines <- safe_read(file, n_max = guess_max, skip = guess_skip(file, guess_max))
   
+  lines <- iconv(lines, from = guess_encoding(file, guess_max), to = "UTF-8")
+  
   # Get string distances
   w_header <- mean(stringdist::stringsim(lines[1], lines[2:length(lines)]))
   wo_header <- mean(stringdist::stringsim(lines[2], lines[3:length(lines)]))
