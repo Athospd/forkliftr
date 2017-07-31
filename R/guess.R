@@ -54,6 +54,7 @@ guess_delim <- function(file, guess_max = 10, verbose = FALSE) {
   
   # Read lines safely
   lines <- safe_read(file, n_max = guess_max, skip = guess_skip(file, guess_max))
+  first_line <- lines[1]
   
   # A priori delimiter ranks (to deal with the ties)
   utils::data("a_priori_delimiter_ranks", package = "forkliftr")
@@ -67,8 +68,10 @@ guess_delim <- function(file, guess_max = 10, verbose = FALSE) {
     dplyr::group_by(rank, char_raw) %>% # Get chars with same count
     dplyr::summarise(var = var(count), n = n()) %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(char = raw_to_char(char_raw)) %>%
-    dplyr::arrange(var, -n, -rank, char_raw) %>%
+    dplyr::mutate(char = raw_to_char(char_raw),
+                  is_present_at_first_line = stringi::stri_detect_fixed(first_line, char)) %>%
+    # if it has header, the candidate char must figure at least once at the first line of the file.
+    dplyr::arrange(desc(is_present_at_first_line), var, -n, -rank, char_raw) %>%
     dplyr::slice(1:10) %>%
     dplyr::select(-rank)
   
