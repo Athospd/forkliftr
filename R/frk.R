@@ -40,10 +40,7 @@ frk_summarise <- function(files, guess_max = 10, verbose = FALSE) {
   }
   
   # Get summary for all files
-  summary <- purrr::map(files, ~frk_summarise_(.x, guess_max, verbose))
-  
-  # Rename elements of list
-  names(summary) <- files
+  summary <- purrr::map_df(files, ~frk_summarise_(.x, guess_max, verbose))
   
   return(summary)
 }
@@ -53,7 +50,7 @@ frk_summarise <- function(files, guess_max = 10, verbose = FALSE) {
 #' @param file Path to file
 #' @param guess_max Maximum number of records to use for guess
 #' @param verbose Whether to output guess as message
-#' @return A list with the guesses for each file
+#' @return A named list with the guesses for the specified file
 frk_summarise_ <- function(file, guess_max = 10, verbose = FALSE) {
   
   # Guess delim
@@ -86,8 +83,8 @@ frk_summarise_ <- function(file, guess_max = 10, verbose = FALSE) {
     delim = guessed_delim,
     encoding = guessed_encoding,
     has_header = guessed_has_header,
-    col_types = guessed_col_types,
-    col_names = guessed_col_names,
+    col_types = list(guessed_col_types),
+    col_names = list(guessed_col_names),
     quote = guessed_quote,
     skip = guessed_skip,
     decimal_mark = guessed_decimal_mark,
