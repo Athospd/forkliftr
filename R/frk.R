@@ -60,7 +60,7 @@ frk_summarise_ <- function(file, guess_max = 10, verbose = FALSE) {
   guessed_delim = guess_delim(file, guess_max, verbose)$char[1]
   
   # Guess encoding
-  guessed_encoding = guess_encoding(file, guess_max, verbose)$encoding[1]
+  guessed_encoding = guess_encoding(file, guess_max, verbose)
   
   # Guess has header
   guessed_has_header = guess_has_header(file, guess_max, verbose)
