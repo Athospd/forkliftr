@@ -11,18 +11,17 @@ file_large <- tempfile()
 write_csv(large, file_large, ",")
 
 
-
+# tiny ugly table
 tiny_ugly <- "A,B,C\ná,é,í\nã,ÿ,&"
-guess_encoding(tiny_ugly, threshold = 0.1)
-stri_enc_detect(tiny_ugly)
-
 file_tiny_ugly <- tempfile()
 write.table(tiny_ugly, file_tiny_ugly, quote = FALSE, sep = ",", col.names = TRUE, fileEncoding = "UTF-8")
 
-writeLines(stri_replace_all_regex(file_tiny_ugly, "\\\\", "/"), "clipboard")
 
-guess_encoding(file_tiny_ugly, guess_max = 10, threshold = 0)
 
+test_that("guess_encoding returns just one atomic character", {
+  expect_identical(length(guess_encoding(file_large)), 1)
+  expect_identical(length(guess_encoding(file_tiny_ugly)), 1)
+})
 
 test_that("guess_encoding wraps correclty", {
   expect_identical(guess_encoding(file_large), "ASCII")
