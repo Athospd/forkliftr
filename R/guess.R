@@ -133,10 +133,10 @@ guess_has_header <- function(file, guess_max = 10, verbose = FALSE) {
 
 #' @rdname guess
 #' @export
-guess_col_types <- function(file, guess_max = 10, verbose = FALSE) {
+guess_col_types <- function(file, guess_max = 10, verbose = FALSE, delim = guess_delim(file, guess_max), skip = guess_skip(file, guess_max)) {
   
   # Get file column specification
-  read_file <- suppressWarnings(suppressMessages(read_with_guess(file, guess_max)))
+  read_file <- suppressWarnings(suppressMessages(read_with_guess(file, guess_max, delim = delim, skip = skip)))
   col_spec <- attr(read_file, "spec")$cols
   
   # Get colum types
