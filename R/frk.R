@@ -69,29 +69,29 @@ frk_summarise <- function(path, pattern = NULL, recursive = FALSE, guess_max = 1
 #' @return A named list with the guesses for the specified file
 frk_summarise_ <- function(file, guess_max = 10, verbose = FALSE) {
   
-  # Guess delim
-  guessed_delim = guess_delim(file, guess_max, verbose)$char[1]
-  
   # Guess encoding
-  guessed_encoding = guess_encoding(file, guess_max, verbose)
+  guessed_encoding <- guess_encoding(file, guess_max, verbose)
+  
+  # Guess lines to skip
+  guessed_skip <- guess_skip(file, guess_max, verbose)
+  
+  # Guess delim
+  guessed_delim = guess_delim(file, guess_max, verbose, guessed_encoding = guessed_encoding, skip = guessed_skip)$char[1]
   
   # Guess has header
   guessed_has_header = guess_has_header(file, guess_max, verbose)
+  
+  # Guess quote
+  guessed_quote = guess_quote(file, guess_max, verbose, skip = guessed_skip)
   
   # Guess col types
   guessed_col_types = guess_col_types(file, guess_max, verbose)
   
   # Gues col names
-  guessed_col_names = guess_col_names(file, guess_max, verbose)
-  
-  # Guess quote
-  guessed_quote = guess_quote(file, guess_max, verbose)
-  
-  # Guess lines to skip
-  guessed_skip <- guess_skip(file, guess_max, verbose)
+  guessed_col_names = guess_col_names(file, guess_max, verbose, delim = guessed_delim, header = guessed_has_header, quote = guessed_quote, encoding = guessed_encoding, skip = guessed_skip)
   
   # Guess decimal and grouping marks
-  guessed_decimal_mark <- guess_decimal_mark(file, guess_max, verbose)
+  guessed_decimal_mark <- guess_decimal_mark(file, guess_max, verbose, delim = guessed_delim, quote = guessed_quote, skip = guessed_skip)
   guessed_grouping_mark <- guess_grouping_mark(file, guess_max, verbose)
   
   return(list(
