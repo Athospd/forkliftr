@@ -74,7 +74,7 @@ guess_delim <- function(file, guess_max = 10, verbose = FALSE, encoding = guess_
     dplyr::summarise(var = var(count), n = n()) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(char = raw_to_char(char_raw),
-                  is_present_at_first_line = stringi::stri_detect_fixed(first_line, char)) %>%
+                  is_present_at_first_line = stringr::str_detect(first_line, stringr::fixed(char))) %>%
     # if it has header, the candidate char must figure at least once at the first line of the file.
     dplyr::arrange(desc(is_present_at_first_line), var, -n, -rank, char_raw) %>%
     dplyr::slice(1:10) %>%
@@ -133,10 +133,10 @@ guess_has_header <- function(file, guess_max = 10, verbose = FALSE) {
 
 #' @rdname guess
 #' @export
-guess_col_types <- function(file, guess_max = 10, verbose = FALSE, delim = guess_delim(file, guess_max)$char[1], skip = guess_skip(file, guess_max), encoding = guess_encoding(file, guess_max)) {
+guess_col_types <- function(file, guess_max = 10, verbose = FALSE, delim = guess_delim(file, guess_max)$char[1], skip = guess_skip(file, guess_max), encoding = guess_encoding(file, guess_max), quote = guess_quote(file, guess_max)) {
   
   # Get file column specification
-  read_file <- suppressWarnings(suppressMessages(read_with_guess(file, guess_max, delim = delim, skip = skip, encoding = encoding)))
+  read_file <- suppressWarnings(suppressMessages(read_with_guess(file, guess_max, delim = delim, skip = skip, encoding = encoding, quote = quote)))
   col_spec <- attr(read_file, "spec")$cols
   
   # Get colum types
@@ -228,8 +228,8 @@ guess_quote <- function(file, guess_max = 10, verbose = FALSE, skip = guess_skip
     message("Most probable quote: '' (unquoted)")
   }
   
-  most_probable_quote <- most_probable_quote %>% stringr::str_replace_all("(\\W)", "\\\\\\1")
-  
+  most_probable_quote <- stringr::str_c("\\", most_probable_quote)
+
   return(most_probable_quote)
 }
 

@@ -30,8 +30,8 @@ raw_to_char <- function(raw) {
 #' @param guess_max Maximum number of records to use for guesses.
 #' @param delim Single character used to separate fields within a record. Guessed if not specified.
 #' @param skip Number of lines to skip before reading data. Guessed if not specified.
-read_with_guess <- function(file, guess_max, delim = guess_delim(file, guess_max)$char[1], skip = guess_skip(file, guess_max), encoding = guess_encoding(file, guess_max)) {
+read_with_guess <- function(file, guess_max, delim = guess_delim(file, guess_max)$char[1], skip = guess_skip(file, guess_max), encoding = guess_encoding(file, guess_max), quote = guess_quote(file, guess_max)) {
   
   # Read file
-  readr::read_delim(file, delim, n_max = guess_max, guess_max = guess_max, skip = skip, locale = locale(encoding = encoding))
+  readr::read_delim(file, delim, n_max = guess_max, guess_max = guess_max, skip = skip, locale = locale(encoding = encoding), quote = quote)
 }
