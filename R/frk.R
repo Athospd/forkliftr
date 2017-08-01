@@ -33,7 +33,7 @@
 #' }
 #' 
 #' @export
-frk_summarise <- function(path, pattern = NULL, recursive = FALSE, guess_max = 10, verbose = FALSE) {
+frk_summarise <- function(path, pattern = NULL, recursive = FALSE, guess_max = 10, verbose = FALSE, progress = TRUE) {
   
   # If path is a directory, list all the files.
   files <- list.files(path = path, 
@@ -56,7 +56,16 @@ frk_summarise <- function(path, pattern = NULL, recursive = FALSE, guess_max = 1
   }
   
   # Get summary for all files
-  summary <- purrr::map_df(files, ~frk_summarise_(.x, guess_max, verbose))
+  if(progress) {
+    pb <- progress::progress_bar$new(total = length(files))
+    pb$initialize()
+    summary <- purrr::map_df(files, ~{
+      pb$tick()
+      frk_summarise_(.x, guess_max, verbose)
+    })
+  } else {
+    summary <- purrr::map_df(files, ~frk_summarise_(.x, guess_max, verbose))
+  }
   
   return(summary)
 }
@@ -76,7 +85,7 @@ frk_summarise_ <- function(file, guess_max = 10, verbose = FALSE) {
   guessed_skip <- guess_skip(file, guess_max, verbose)
   
   # Guess delim
-  guessed_delim = guess_delim(file, guess_max, verbose, encoding = guessed_encoding, skip = guessed_skip)$char[1]
+  guessed_delim <- guess_delim(file, guess_max, verbose, encoding = guessed_encoding, skip = guessed_skip)$char[1]
   
   # Guess has header
   guessed_has_header = guess_has_header(file, guess_max, verbose)
@@ -94,6 +103,8 @@ frk_summarise_ <- function(file, guess_max = 10, verbose = FALSE) {
   guessed_decimal_mark <- guess_decimal_mark(file, guess_max, verbose, delim = guessed_delim, quote = guessed_quote, skip = guessed_skip)
   guessed_grouping_mark <- guess_grouping_mark(file, guess_max, verbose)
   
+  if(verbose) message(sprintf("%s\n", file))
+  
   return(list(
     file = file,
     delim = guessed_delim,
@@ -101,6 +112,7 @@ frk_summarise_ <- function(file, guess_max = 10, verbose = FALSE) {
     has_header = guessed_has_header,
     col_types = list(guessed_col_types),
     col_names = list(guessed_col_names),
+    suggested_col_names = list(tide_names(guessed_col_names)),
     quote = guessed_quote,
     skip = guessed_skip,
     decimal_mark = guessed_decimal_mark,
