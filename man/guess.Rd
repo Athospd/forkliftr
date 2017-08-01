@@ -23,7 +23,8 @@ guess_has_header(file, guess_max = 10, verbose = FALSE)
 
 guess_col_types(file, guess_max = 10, verbose = FALSE,
   delim = guess_delim(file, guess_max)$char[1], skip = guess_skip(file,
-  guess_max), encoding = guess_encoding(file, guess_max))
+  guess_max), encoding = guess_encoding(file, guess_max),
+  quote = guess_quote(file, guess_max))
 
 guess_col_names(file, guess_max = 10, verbose = FALSE,
   delim = guess_delim(file, guess_max)$char[1],
