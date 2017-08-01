@@ -4,10 +4,12 @@
 #' Runs all functions from the `guess` family to gather all structural
 #' characteristics of given file(s).
 #' 
-#' @param files Path to file or character vector of paths to files
+#' @param path a character vector of full path names; the default corresponds to the working directory, getwd(). Tilde expansion (see path.expand) is performed. Missing values will be ignored.
+#' @param pattern an optional regular expression. Only file names which match the regular expression will be returned.
+#' @param recursive logical. Should the listing recurse into directories?
 #' @param guess_max Maximum number of records to use for guess
 #' @param verbose Whether to output guess as message
-#' @return A list of lists with the guesses for each file
+#' @return A tibble whose lines stores the guesses for each file
 #' 
 #' @seealso [guess_delim()], [guess_col_names()], and the whole `guess` family
 #' 
@@ -31,7 +33,21 @@
 #' }
 #' 
 #' @export
-frk_summarise <- function(files, guess_max = 10, verbose = FALSE) {
+frk_summarise <- function(path, pattern = NULL, recursive = FALSE, guess_max = 10, verbose = FALSE) {
+  
+  # If path is a directory, list all the files.
+  files <- list.files(path = path, 
+                      pattern = pattern, 
+                      all.files = FALSE, 
+                      full.names = TRUE,
+                      recursive = recursive,
+                      ignore.case = FALSE,
+                      include.dirs = FALSE,
+                      no.. = FALSE)
+  
+  # If path is a single file then it will return a length zero object.
+  if(length(files) == 0) files <- path
+  
   
   # Handle verbose
   if (length(files) > 1 & verbose) {
@@ -88,7 +104,14 @@ frk_summarise_ <- function(file, guess_max = 10, verbose = FALSE) {
     quote = guessed_quote,
     skip = guessed_skip,
     decimal_mark = guessed_decimal_mark,
-    grouping_mark = guessed_grouping_mark
+    grouping_mark = guessed_grouping_mark,
+    escape_backslash = FALSE,
+    escape_double = FALSE,
+    na = list(c("", "NA")),
+    quoted_na = TRUE,
+    comment = "",
+    trim_ws = TRUE,
+    n_max = Inf
   ))
 }
 
@@ -158,3 +181,6 @@ frk_read <- function(file,
   
   return(out)
 }
+
+
+

@@ -14,7 +14,7 @@ frk_summarise(files, guess_max = 10, verbose = FALSE)
 \item{verbose}{Whether to output guess as message}
 }
 \value{
-A list of lists with the guesses for each file
+A tibble whose lines stores the guesses for each file
 }
 \description{
 Runs all functions from the \code{guess} family to gather all structural

@@ -14,7 +14,7 @@ frk_summarise_(file, guess_max = 10, verbose = FALSE)
 \item{verbose}{Whether to output guess as message}
 }
 \value{
-A list with the guesses for each file
+A named list with the guesses for the specified file
 }
 \description{
 Guess all structural characteristics of a flat file

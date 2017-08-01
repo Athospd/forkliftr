@@ -15,7 +15,7 @@
 \usage{
 guess_delim(file, guess_max = 10, verbose = FALSE)
 
-guess_encoding(file, guess_max = 10, verbose = FALSE)
+guess_encoding(file, guess_max = 10, verbose = FALSE, threshold = 0.2)
 
 guess_has_header(file, guess_max = 10, verbose = FALSE)
 
