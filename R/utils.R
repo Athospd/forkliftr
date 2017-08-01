@@ -65,23 +65,24 @@ tide_names <- function(x) {
 #' @export
 rm_accent <- function(str) {
   if(!is.character(str)) str <- as.character(str)
-  symbols <- c(
-    acute = "áéíóúÁÉÍÓÚýÝ",
-    grave = "àèìòùÀÈÌÒÙ",
-    circunflex = "âêîôûÂÊÎÔÛ",
-    tilde = "ãõÃÕñÑ",
-    umlaut = "äëïöüÄËÏÖÜÿ",
-    cedil = "çÇ"
-  )
-  nudeSymbols <- c(
-    acute = "aeiouAEIOUyY",
-    grave = "aeiouAEIOU",
-    circunflex = "aeiouAEIOU",
-    tilde = "aoAOnN",
-    umlaut = "aeiouAEIOUy",
-    cedil = "cC"
-  )
-  return(chartr(paste(symbols, collapse=""), paste(nudeSymbols, collapse=""), str))
+  # symbols <- c(
+  #   acute = "áéíóúÁÉÍÓÚýÝ",
+  #   grave = "àèìòùÀÈÌÒÙ",
+  #   circunflex = "âêîôûÂÊÎÔÛ",
+  #   tilde = "ãõÃÕñÑ",
+  #   umlaut = "äëïöüÄËÏÖÜÿ",
+  #   cedil = "çÇ"
+  # )
+  # nudeSymbols <- c(
+  #   acute = "aeiouAEIOUyY",
+  #   grave = "aeiouAEIOU",
+  #   circunflex = "aeiouAEIOU",
+  #   tilde = "aoAOnN",
+  #   umlaut = "aeiouAEIOUy",
+  #   cedil = "cC"
+  # )
+  # return(chartr(paste(symbols, collapse=""), paste(nudeSymbols, collapse=""), str))
+  return(str)
 }
 
 #' Enumarate repeated names
