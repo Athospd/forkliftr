@@ -13,21 +13,32 @@
 \alias{guess_grouping_mark}
 \title{Guess structural characteristic of a flat file}
 \usage{
-guess_delim(file, guess_max = 10, verbose = FALSE)
+guess_delim(file, guess_max = 10, verbose = FALSE,
+  encoding = guess_encoding(file, guess_max), skip = guess_skip(file,
+  guess_max))
 
 guess_encoding(file, guess_max = 10, verbose = FALSE, threshold = 0.2)
 
 guess_has_header(file, guess_max = 10, verbose = FALSE)
 
-guess_col_types(file, guess_max = 10, verbose = FALSE)
+guess_col_types(file, guess_max = 10, verbose = FALSE,
+  delim = guess_delim(file, guess_max)$char[1], skip = guess_skip(file,
+  guess_max), encoding = guess_encoding(file, guess_max))
 
-guess_col_names(file, guess_max = 10, verbose = FALSE)
+guess_col_names(file, guess_max = 10, verbose = FALSE,
+  delim = guess_delim(file, guess_max)$char[1],
+  header = guess_has_header(file, guess_max), quote = guess_quote(file,
+  guess_max), encoding = guess_encoding(file, guess_max),
+  skip = guess_skip(file, guess_max))
 
-guess_quote(file, guess_max = 10, verbose = FALSE)
+guess_quote(file, guess_max = 10, verbose = FALSE, skip = guess_skip(file,
+  guess_max))
 
 guess_skip(file, guess_max = 10, verbose = FALSE)
 
-guess_decimal_mark(file, guess_max = 10, verbose = FALSE)
+guess_decimal_mark(file, guess_max = 10, verbose = FALSE,
+  delim = guess_delim(file, guess_max)$char[1], quote = guess_quote(file,
+  guess_max), skip = guess_skip(file, guess_max))
 
 guess_grouping_mark(file, guess_max = 10, verbose = FALSE)
 }
@@ -37,6 +48,10 @@ guess_grouping_mark(file, guess_max = 10, verbose = FALSE)
 \item{guess_max}{Maximum number of records to use for guess}
 
 \item{verbose}{Whether to output guess as message}
+
+\item{encoding}{Default encoding. This only affects how the file is read. Guessed if not specified.}
+
+\item{skip}{Number of lines to skip before reading data. Guessed if not specified.}
 }
 \value{
 All \code{guess} functions return an object that can be used as

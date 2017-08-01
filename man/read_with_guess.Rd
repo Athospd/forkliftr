@@ -4,12 +4,18 @@
 \alias{read_with_guess}
 \title{Auxiliar function to read file while guessing delimiter and skip}
 \usage{
-read_with_guess(file, guess_max)
+read_with_guess(file, guess_max, delim = guess_delim(file, guess_max)$char[1],
+  skip = guess_skip(file, guess_max), encoding = guess_encoding(file,
+  guess_max))
 }
 \arguments{
-\item{file}{Path to file}
+\item{file}{Path to file.}
 
-\item{guess_max}{Maximum number of records to use for guesses}
+\item{guess_max}{Maximum number of records to use for guesses.}
+
+\item{delim}{Single character used to separate fields within a record. Guessed if not specified.}
+
+\item{skip}{Number of lines to skip before reading data. Guessed if not specified.}
 }
 \description{
 Auxiliar function to read file while guessing delimiter and skip

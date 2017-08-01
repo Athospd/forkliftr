@@ -4,10 +4,15 @@
 \alias{frk_summarise}
 \title{Guess all structural characteristics of one or more flat files}
 \usage{
-frk_summarise(files, guess_max = 10, verbose = FALSE)
+frk_summarise(path, pattern = NULL, recursive = FALSE, guess_max = 10,
+  verbose = FALSE)
 }
 \arguments{
-\item{files}{Path to file or character vector of paths to files}
+\item{path}{a character vector of full path names; the default corresponds to the working directory, getwd(). Tilde expansion (see path.expand) is performed. Missing values will be ignored.}
+
+\item{pattern}{an optional regular expression. Only file names which match the regular expression will be returned.}
+
+\item{recursive}{logical. Should the listing recurse into directories?}
 
 \item{guess_max}{Maximum number of records to use for guess}
 
