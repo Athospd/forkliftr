@@ -25,6 +25,8 @@
 #' @param file Path to file
 #' @param guess_max Maximum number of records to use for guess
 #' @param verbose Whether to output guess as message
+#' @param encoding Default encoding. This only affects how the file is read. Guessed if not specified.
+#' @param skip Number of lines to skip before reading data. Guessed if not specified.
 #' @return All `guess` functions return an object that can be used as
 #' it's appropriate argument in [readr::read_delim()] or [readr::locale()]
 #' 
@@ -50,10 +52,13 @@ NULL
 
 #' @rdname guess
 #' @export
-guess_delim <- function(file, guess_max = 10, verbose = FALSE) {
+guess_delim <- function(file, guess_max = 10, verbose = FALSE, encoding = guess_encoding(file, guess_max), skip = guess_skip(file, guess_max)) {
   
   # Read lines safely
-  lines <- safe_read(file, n_max = guess_max, skip = guess_skip(file, guess_max))
+  lines <- safe_read(file, 
+                     n_max = guess_max, 
+                     skip = skip, 
+                     locale = locale(encoding = encoding))
   first_line <- lines[1]
   
   # A priori delimiter ranks (to deal with the ties)
@@ -154,7 +159,7 @@ guess_col_types <- function(file, guess_max = 10, verbose = FALSE) {
 
 #' @rdname guess
 #' @export
-guess_col_names <- function(file, guess_max = 10, verbose = FALSE) {
+guess_col_names <- function(file, guess_max = 10, verbose = FALSE, delim = guess_delim(file, guess_max)$char[1], header = guess_has_header(file, guess_max),  quote = guess_quote(file, guess_max), encoding = guess_encoding(file, guess_max), skip = guess_skip(file, guess_max)) {
   
   # Remove quotes in string
   remove_with_quote <- function(string, quote) {
@@ -165,15 +170,13 @@ guess_col_names <- function(file, guess_max = 10, verbose = FALSE) {
   }
   
   # Get delim (escaped)
-  delim <- guess_delim(file, guess_max)$char[1] %>%
-    stringr::str_replace_all("(\\W)", "\\\\\\1")
-  quote <- guess_quote(file, guess_max) %>%
-    stringr::str_replace_all("(\\W)", "\\\\\\1")
+  delim <- delim %>% stringr::str_replace_all("(\\W)", "\\\\\\1")
+  quote <- quote %>% stringr::str_replace_all("(\\W)", "\\\\\\1")
   
   # Read lines safely
-  if (guess_has_header(file, guess_max)) {
+  if (header) {
     header <- file %>%
-      safe_read(n_max = 1, skip = guess_skip(file, guess_max)) %>%
+      safe_read(n_max = 1, skip = skip, locale = locale(encoding = encoding)) %>%
       remove_with_quote(quote)
     header <- stringr::str_split(header, delim)[[1]]
   } else {
