@@ -228,6 +228,8 @@ guess_quote <- function(file, guess_max = 10, verbose = FALSE, skip = guess_skip
     message("Most probable quote: '' (unquoted)")
   }
   
+  most_probable_quote <- most_probable_quote %>% stringr::str_replace_all("(\\W)", "\\\\\\1")
+  
   return(most_probable_quote)
 }
 
