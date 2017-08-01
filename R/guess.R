@@ -203,10 +203,10 @@ guess_col_names <- function(file, guess_max = 10, verbose = FALSE, delim = guess
 
 #' @rdname guess
 #' @export
-guess_quote <- function(file, guess_max = 10, verbose = FALSE) {
+guess_quote <- function(file, guess_max = 10, verbose = FALSE, skip = guess_skip(file, guess_max)) {
   
   # Read lines safely
-  lines <- safe_read(file, n_max = guess_max, skip = guess_skip(file, guess_max))
+  lines <- safe_read(file, n_max = guess_max, skip = skip)
   
   # The candidates to be delims
   quotes_ordered_by_probability <- lines %>%
@@ -249,7 +249,7 @@ guess_skip <- function(file, guess_max = 10, verbose = FALSE) {
 
 #' @rdname guess
 #' @export
-guess_decimal_mark <- function(file, guess_max = 10, verbose = FALSE) {
+guess_decimal_mark <- function(file, guess_max = 10, verbose = FALSE, delim = guess_delim(file, guess_max)$char[1], quote = guess_quote(file, guess_max), skip = guess_skip(file, guess_max)) {
   
   # Function to filter lines given a quote
   filter_lines <- function(lines, quote) {
@@ -262,14 +262,12 @@ guess_decimal_mark <- function(file, guess_max = 10, verbose = FALSE) {
   }
   
   # Read lines safely
-  lines <- safe_read(file, n_max = guess_max, skip = guess_skip(file, guess_max) + 1)
+  lines <- safe_read(file, n_max = guess_max, skip = skip + 1)
   
   # Get delim and quote (escaped)
-  delim <- guess_delim(file, guess_max)$char[1] %>%
-    stringr::str_replace_all("(\\W)", "\\\\\\1")
-  quote <- guess_quote(file, guess_max) %>%
-    stringr::str_replace_all("(\\W)", "\\\\\\1")
-
+  delim <- delim %>% stringr::str_replace_all("(\\W)", "\\\\\\1")
+  quote <- quote %>% stringr::str_replace_all("(\\W)", "\\\\\\1")
+  
   # Compute stats for each mark
   stats <- lines %>%
     stringr::str_split(delim) %>%
