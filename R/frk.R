@@ -85,7 +85,7 @@ frk_summarise_ <- function(file, guess_max = 10, verbose = FALSE) {
   guessed_quote = guess_quote(file, guess_max, verbose, skip = guessed_skip)
   
   # Guess col types
-  guessed_col_types = guess_col_types(file, guess_max, verbose)
+  guessed_col_types = guess_col_types(file, guess_max, verbose, delim = guessed_delim, skip = guessed_skip, encoding = guessed_encoding)
   
   # Gues col names
   guessed_col_names = guess_col_names(file, guess_max, verbose, delim = guessed_delim, header = guessed_has_header, quote = guessed_quote, encoding = guessed_encoding, skip = guessed_skip)
