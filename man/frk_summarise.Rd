@@ -5,7 +5,7 @@
 \title{Guess all structural characteristics of one or more flat files}
 \usage{
 frk_summarise(path, pattern = NULL, recursive = FALSE, guess_max = 10,
-  verbose = FALSE)
+  verbose = FALSE, progress = TRUE)
 }
 \arguments{
 \item{path}{a character vector of full path names; the default corresponds to the working directory, getwd(). Tilde expansion (see path.expand) is performed. Missing values will be ignored.}

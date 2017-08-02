@@ -58,7 +58,6 @@ frk_summarise <- function(path, pattern = NULL, recursive = FALSE, guess_max = 1
   # Get summary for all files
   if(progress) {
     pb <- progress::progress_bar$new(total = length(files))
-    pb$initialize()
     summary <- purrr::map_df(files, ~{
       pb$tick()
       frk_summarise_(.x, guess_max, verbose)

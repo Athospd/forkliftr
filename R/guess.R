@@ -219,7 +219,7 @@ guess_quote <- function(file, guess_max = 10, verbose = FALSE, skip = guess_skip
     dplyr::arrange(-mean)
   
   most_probable_quote <- quotes_ordered_by_probability$char[1]
-  most_probable_quote <- ifelse(is.na(most_probable_quote), "", most_probable_quote) 
+  most_probable_quote <- ifelse(is.na(most_probable_quote), "", stringr::str_c("\\", most_probable_quote))
   
   # Message delimiter found
   if(verbose & most_probable_quote != "") {
@@ -228,7 +228,6 @@ guess_quote <- function(file, guess_max = 10, verbose = FALSE, skip = guess_skip
     message("Most probable quote: '' (unquoted)")
   }
   
-  most_probable_quote <- stringr::str_c("\\", most_probable_quote)
 
   return(most_probable_quote)
 }
