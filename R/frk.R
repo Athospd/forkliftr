@@ -127,11 +127,11 @@ frk_summarise_ <- function(file, guess_max = 10, verbose = FALSE) {
 }
 
 
-#' Read flat files knowing nothing about them
+#' Read flat file knowing nothing about them
 #' 
 #' @description
 #' This is a wrapper for [readr::read_delim()] that guesses the main arguments,
-#' namely `delim`, `quote`, `col_names`, `locale`, and `skip`.
+#' namely `delim`, `quote`, `col_names`, `encoding`, `decimal_mark`, `grouping_mark`, and `skip`.
 #' 
 #' @param file Path to file
 #' @param delim (Guessed) Delimiter of file
@@ -160,12 +160,12 @@ frk_summarise_ <- function(file, guess_max = 10, verbose = FALSE) {
 #'   col.names = TRUE, row.names = FALSE)
 #' 
 #' # Read file
-#' tbl <- frk_read(file)
+#' tbl <- frk_read_delim(file)
 #' glimpse(tbl)
 #' }
 #' 
 #' @export
-frk_read <- function(file,
+frk_read_delim <- function(file,
                      delim = guess_delim(file, guess_max)$char[1],
                      quote = guess_quote(file, guess_max),
                      escape_backslash = FALSE,
@@ -192,6 +192,9 @@ frk_read <- function(file,
   
   return(out)
 }
+
+
+
 
 
 

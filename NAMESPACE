@@ -2,7 +2,7 @@
 
 export("%>%")
 export(enum_repeated_names)
-export(frk_read)
+export(frk_read_delim)
 export(frk_summarise)
 export(guess_col_names)
 export(guess_col_types)
