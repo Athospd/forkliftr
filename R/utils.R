@@ -30,7 +30,7 @@ tide_names <- function(x) {
     # all chars to lower case
     base::tolower() %>%
     # remove accents
-    rm_accent() %>%
+    rslp:::remove_accents() %>%
     # replace spaces, periods and slashes to _
     stringr::str_replace_all("[ \\./\\\\]", "_") %>%
     # replace spaces or sequence of _'s to a single _
@@ -39,50 +39,6 @@ tide_names <- function(x) {
     stringr::str_replace_all("[^a-z0-9_]|_+$", "") %>%
     # enumerate repeated names if any
     enum_repeated_names()
-}
-
-
-#' Remove accents from words
-#' 
-#' @description
-#' Replace each character with it accentless version, including cedillas.
-#' 
-#' Current accents:
-#' 
-#' acute = áéíóúÁÉÍÓÚýÝ
-#' grave = àèìòùÀÈÌÒÙ
-#' circunflex = âêîôûÂÊÎÔÛ
-#' tilde = "ãõÃÕñÑ
-#' umlaut = äëïöüÄËÏÖÜÿ
-#' cedil = çÇ
-#' 
-#' @param str a character vector.
-#' 
-#' @examples
-#' 
-#' rm_accent(c("àquela", "Ñ", "opção", "açaí"))
-#' 
-#' @export
-rm_accent <- function(str) {
-  if(!is.character(str)) str <- as.character(str)
-  # symbols <- c(
-  #   acute = "áéíóúÁÉÍÓÚýÝ",
-  #   grave = "àèìòùÀÈÌÒÙ",
-  #   circunflex = "âêîôûÂÊÎÔÛ",
-  #   tilde = "ãõÃÕñÑ",
-  #   umlaut = "äëïöüÄËÏÖÜÿ",
-  #   cedil = "çÇ"
-  # )
-  # nudeSymbols <- c(
-  #   acute = "aeiouAEIOUyY",
-  #   grave = "aeiouAEIOU",
-  #   circunflex = "aeiouAEIOU",
-  #   tilde = "aoAOnN",
-  #   umlaut = "aeiouAEIOUy",
-  #   cedil = "cC"
-  # )
-  # return(chartr(paste(symbols, collapse=""), paste(nudeSymbols, collapse=""), str))
-  return(str)
 }
 
 #' Enumarate repeated names

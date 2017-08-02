@@ -10,6 +10,19 @@ large <- as_tibble(nasa)
 file_large <- tempfile()
 write_csv(large, file_large, ",")
 
+frk_summarise(file_large, guess_max = 3, verbose = TRUE)
+file = file_large
+guess_max = 10
+verbose = FALSE
+encoding = guess_encoding(file, guess_max)
+skip = guess_skip(file, guess_max)
+
+lines <- forkliftr:::safe_read(file, 
+                   n_max = guess_max, 
+                   skip = skip, 
+                   locale = locale(encoding = encoding))
+first_line <- lines[1]
+
 
 # tiny ugly table
 tiny_ugly <- "A,B,C\ná,é,í\nã,ÿ,&"
