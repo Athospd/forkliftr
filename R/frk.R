@@ -55,9 +55,12 @@ frk_summarise <- function(path, pattern = NULL, recursive = FALSE, guess_max = 1
     verbose <- FALSE
   }
   
+  message("Summarising files")
+  
   # Get summary for all files
   if(progress) {
-    pb <- progress::progress_bar$new(total = length(files))
+    pb <- progress::progress_bar$new(total = length(files),
+                                     format = "[:bar] :current of :total")
     summary <- purrr::map_df(files, ~{
       pb$tick()
       frk_summarise_(.x, guess_max, verbose)
@@ -77,35 +80,67 @@ frk_summarise <- function(path, pattern = NULL, recursive = FALSE, guess_max = 1
 #' @return A named list with the guesses for the specified file
 frk_summarise_ <- function(file, guess_max = 10, verbose = FALSE) {
   
-  # Guess encoding
-  guessed_encoding <- guess_encoding(file, guess_max, verbose)
+  # file extension
+  file_ext <- base::tolower(tools::file_ext(file))
   
-  # Guess lines to skip
-  guessed_skip <- guess_skip(file, guess_max, verbose)
+  if(file_ext %in% c("txt", "tsv", "csv", "dat", "")) {
+    # Guess encoding
+    guessed_encoding <- guess_encoding(file, guess_max, verbose)
+    
+    # Guess lines to skip
+    guessed_skip <- guess_skip(file, guess_max, verbose)
+    
+    # Guess delim
+    guessed_delim <- guess_delim(file, guess_max, verbose, encoding = guessed_encoding, skip = guessed_skip)$char[1]
+    
+    # Guess has header
+    guessed_has_header = guess_has_header(file, guess_max, verbose, skip = guessed_skip, encoding = guessed_encoding)
+    
+    # Guess quote
+    guessed_quote = guess_quote(file, guess_max, verbose, skip = guessed_skip)
+    
+    # Guess col types
+    guessed_col_types = guess_col_types(file, guess_max, verbose, delim = guessed_delim, skip = guessed_skip, encoding = guessed_encoding)
+    
+    # Gues col names
+    guessed_col_names = guess_col_names(file, guess_max, verbose, delim = guessed_delim, header = guessed_has_header, quote = guessed_quote, encoding = guessed_encoding, skip = guessed_skip)
+    
+    # Guess decimal and grouping marks
+    guessed_decimal_mark <- guess_decimal_mark(file, guess_max, verbose, delim = guessed_delim, quote = guessed_quote, skip = guessed_skip)
+    guessed_grouping_mark <- guess_grouping_mark(file, guess_max, verbose)
+  } else {
+    # Guess encoding
+    guessed_encoding <- as.character(NA)
+    
+    # Guess lines to skip
+    guessed_skip <- as.numeric(NA)
+    
+    # Guess delim
+    guessed_delim <- as.character(NA)
+    
+    # Guess has header
+    guessed_has_header <- as.logical(NA)
+    
+    # Guess quote
+    guessed_quote <- as.character(NA)
+    
+    # Guess col types
+    guessed_col_types <- as.list(NA)
+    
+    # Gues col names
+    guessed_col_names <- as.list(NA)
+    
+    # Guess decimal and grouping marks
+    guessed_decimal_mark <- as.character(NA)
+    guessed_grouping_mark <- as.character(NA)
+  }
   
-  # Guess delim
-  guessed_delim <- guess_delim(file, guess_max, verbose, encoding = guessed_encoding, skip = guessed_skip)$char[1]
-  
-  # Guess has header
-  guessed_has_header = guess_has_header(file, guess_max, verbose)
-  
-  # Guess quote
-  guessed_quote = guess_quote(file, guess_max, verbose, skip = guessed_skip)
-  
-  # Guess col types
-  guessed_col_types = guess_col_types(file, guess_max, verbose, delim = guessed_delim, skip = guessed_skip, encoding = guessed_encoding)
-  
-  # Gues col names
-  guessed_col_names = guess_col_names(file, guess_max, verbose, delim = guessed_delim, header = guessed_has_header, quote = guessed_quote, encoding = guessed_encoding, skip = guessed_skip)
-  
-  # Guess decimal and grouping marks
-  guessed_decimal_mark <- guess_decimal_mark(file, guess_max, verbose, delim = guessed_delim, quote = guessed_quote, skip = guessed_skip)
-  guessed_grouping_mark <- guess_grouping_mark(file, guess_max, verbose)
   
   if(verbose) message(sprintf("%s\n", file))
   
   return(list(
     file = file,
+    file_ext = file_ext,
     delim = guessed_delim,
     encoding = guessed_encoding,
     has_header = guessed_has_header,
@@ -166,23 +201,23 @@ frk_summarise_ <- function(file, guess_max = 10, verbose = FALSE) {
 #' 
 #' @export
 frk_read_delim <- function(file,
-                     delim = guess_delim(file, guess_max)$char[1],
-                     quote = guess_quote(file, guess_max),
-                     escape_backslash = FALSE,
-                     escape_double = TRUE,
-                     col_names = guess_has_header(file, guess_max),
-                     col_types = NULL,
-                     locale = readr::locale(
-                       encoding = guess_encoding(file, guess_max)$encoding[1],
-                       decimal_mark = guess_decimal_mark(file, guess_max),
-                       grouping_mark = guess_grouping_mark(file, guess_max)),
-                     na = c("", "NA"),
-                     quoted_na = TRUE,
-                     comment = "",
-                     trim_ws = TRUE,
-                     skip = guess_skip(file, guess_max),
-                     n_max = Inf,
-                     guess_max = min(10, n_max)) {
+                           delim = guess_delim(file, guess_max)$char[1],
+                           quote = guess_quote(file, guess_max),
+                           escape_backslash = FALSE,
+                           escape_double = TRUE,
+                           col_names = guess_has_header(file, guess_max),
+                           col_types = NULL,
+                           locale = readr::locale(
+                             encoding = guess_encoding(file, guess_max)$encoding[1],
+                             decimal_mark = guess_decimal_mark(file, guess_max),
+                             grouping_mark = guess_grouping_mark(file, guess_max)),
+                           na = c("", "NA"),
+                           quoted_na = TRUE,
+                           comment = "",
+                           trim_ws = TRUE,
+                           skip = guess_skip(file, guess_max),
+                           n_max = Inf,
+                           guess_max = min(10, n_max)) {
   
   # Use read delim with new arguments
   out <- readr::read_delim(
@@ -194,7 +229,25 @@ frk_read_delim <- function(file,
 }
 
 
-
-
+#' Stack a set of files from a instruction
+#' 
+#' @description
+#' This is a wrapper for [readr::read_delim()] that guesses the main arguments,
+#' namely `delim`, `quote`, `col_names`, `encoding`, `decimal_mark`, `grouping_mark`, and `skip`.
+#' 
+#' @param file A tibble returned by \code{frk_summarise()}.
+#' 
+#' @seealso [frk_summarise()], [frk_read_delim()]
+#' 
+#' @examples
+#' \dontrun{
+#' dir <- "~/folder_full_of_flat_files"
+#' stacked_files <- dir %>% frk_summarise %>% frk_stack
+#' }
+#' 
+#' @export
+frk_stack <- function(instruction) {
+  purrr::map(instruction, ~frk_read_delim)
+}
 
 
