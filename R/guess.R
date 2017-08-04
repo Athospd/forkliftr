@@ -110,12 +110,12 @@ guess_encoding <- function(file, guess_max = 10, verbose = FALSE, threshold = 0.
 
 #' @rdname guess
 #' @export
-guess_has_header <- function(file, guess_max = 10, verbose = FALSE) {
+guess_has_header <- function(file, guess_max = 10, verbose = FALSE, skip = guess_skip(file, guess_max), encoding = guess_encoding(file, guess_max)) {
   
   # Read lines safely
-  lines <- safe_read(file, n_max = guess_max, skip = guess_skip(file, guess_max))
+  lines <- safe_read(file, n_max = guess_max, skip = skip)
   
-  lines <- iconv(lines, from = guess_encoding(file, guess_max), to = "UTF-8")
+  lines <- iconv(lines, from = encoding, to = "UTF-8")
   
   # Get string distances
   w_header <- mean(stringdist::stringsim(lines[1], lines[2:length(lines)]))
@@ -316,3 +316,4 @@ guess_grouping_mark <- function(file, guess_max = 10, verbose = FALSE) {
   
   return(grouping_mark)
 }
+
