@@ -37,6 +37,8 @@ tide_names <- function(x) {
     stringr::str_replace_all(" |_{2,}", "_") %>%
     # remove everything that is no alphanumeric nor _
     stringr::str_replace_all("[^a-z0-9_]|_+$", "") %>%
+    # replace empty names to informative text '_empty_'
+    stringr::str_replace_all("^[[:blank:][:cntrl:]]*$", "_empty_") %>%
     # enumerate repeated names if any
     enum_repeated_names()
 }
@@ -64,3 +66,4 @@ enum_repeated_names <- function(str) {
     tidyr::unite(name_suffix, name, suffix, sep = "") %>%
     dplyr::pull(name_suffix)
 }
+

@@ -31,26 +31,33 @@ write.table(large, file_large4, sep = "\t", col.names = TRUE, row.names = FALSE)
 dir <- c(file_tiny, file_large1, file_large2, file_large3, file_large4)
 
 # Output of frk_summarise_tabular_file
-ans <- list(list(
+ans <- tibble::tibble(
   file = file_tiny,
   delim = ",",
   encoding = "ASCII",
   has_header = TRUE,
-  col_types = c("character", "double", "character", "integer"),
-  col_names = c("column1", "column2", "column3", "column4"),
-  quote = "\"",
+  col_types = list(c("character", "double", "character", "integer")),
+  col_names = list(c("column1", "column2", "column3", "column4")),
+  suggested_col_names = list(c("column1", "column2", "column3", "column4")),
+  quote = "\\\"",
   skip = 0,
   decimal_mark = ".",
-  grouping_mark = ","
-))
-names(ans) <- file_tiny
+  grouping_mark = ",",
+  escape_backslash = FALSE,
+  escape_double = FALSE,
+  na = list(c("", "NA")),
+  quoted_na = TRUE,
+  comment = "",
+  trim_ws = TRUE,
+  n_max = Inf
+)
 
 test_that("frk_summarise works with one file", {
-  expect_identical(frk_summarise(file_tiny), ans)
-  expect_message(frk_summarise(file_tiny, verbose = TRUE))
+  expect_identical(frk_summarise(file_tiny, progress = FALSE), ans)
+  expect_message(frk_summarise(file_tiny, progress = FALSE, verbose = TRUE))
 })
 
 test_that("frk_summarise works with more than one file", {
-  expect_equal(length(frk_summarise(dir)), 5)
-  expect_equal(length(frk_summarise(dir)[[3]]), 10)
+  expect_equal(nrow(frk_summarise(dir, progress = FALSE)), 5)
+  expect_equal(ncol(frk_summarise(dir, progress = FALSE)), 18)
 })
