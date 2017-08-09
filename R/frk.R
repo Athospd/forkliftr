@@ -106,7 +106,7 @@ frk_summarise_ <- function(file, guess_max = 10, verbose = FALSE) {
     guessed_col_names <- guess_col_names(file, guess_max, verbose, delim = guessed_delim, header = guessed_has_header, quote = guessed_quote, encoding = guessed_encoding, skip = guessed_skip)
     
     # Suggested col names
-    suggested_col_names <- if(guessed_has_header) tide_names(guessed_col_names) else as.list(NA)
+    suggested_col_names <- if(guessed_has_header) tide_names(guessed_col_names) else FALSE
     
     # Guess decimal and grouping marks
     guessed_decimal_mark <- guess_decimal_mark(file, guess_max, verbose, delim = guessed_delim, quote = guessed_quote, skip = guessed_skip)
