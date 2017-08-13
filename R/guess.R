@@ -76,7 +76,7 @@ guess_delim <- function(file, guess_max = 10, verbose = FALSE, encoding = guess_
     dplyr::mutate(char = raw_to_char(char_raw),
                   is_present_at_first_line = stringr::str_detect(first_line, stringr::fixed(char))) %>%
     # if it has header, the candidate char must figure at least once at the first line of the file.
-    dplyr::arrange(desc(is_present_at_first_line), var, -n, -rank, char_raw) %>%
+    dplyr::arrange(desc(is_present_at_first_line), var, desc(n), desc(rank), char_raw) %>%
     dplyr::slice(1:10) %>%
     dplyr::select(-rank)
   
@@ -123,6 +123,8 @@ guess_has_header <- function(file, guess_max = 10, verbose = FALSE, skip = guess
   
   # Check whether header exists
   header <- w_header < wo_header*0.5
+  
+  header <- if(is.na(header)) FALSE else header
   
   # Message header found
   if(verbose & header) message("File probably has a header")
