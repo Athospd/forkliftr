@@ -4,7 +4,7 @@
 \alias{frk_summarise_}
 \title{Guess all structural characteristics of a flat file}
 \usage{
-frk_summarise_(file, guess_max = 10, verbose = FALSE)
+frk_summarise_(file, guess_max = 10, skip = NULL, verbose = FALSE)
 }
 \arguments{
 \item{file}{Path to file}

@@ -8,7 +8,9 @@
 #' @param pattern an optional regular expression. Only file names which match the regular expression will be returned.
 #' @param recursive logical. Should the listing recurse into directories?
 #' @param guess_max Maximum number of records to use for guess
+#' @param skip atomic numeric specifying the number of lines to skip in each file. If NULL, it will be guessed.
 #' @param verbose Whether to output guess as message
+#' @param progress Show progress bar?
 #' @return A tibble whose lines stores the guesses for each file
 #' 
 #' @seealso [guess_delim()], [guess_col_names()], and the whole `guess` family
@@ -33,7 +35,13 @@
 #' }
 #' 
 #' @export
-frk_summarise <- function(path, pattern = NULL, recursive = FALSE, guess_max = 10, verbose = FALSE, progress = TRUE) {
+frk_summarise <- function(path, 
+                          pattern = NULL, 
+                          recursive = FALSE, 
+                          guess_max = 10, 
+                          skip = NULL,
+                          verbose = FALSE, 
+                          progress = TRUE) {
   
   # If path is a directory, list all the files.
   files <- list.files(path = path, 
@@ -63,7 +71,7 @@ frk_summarise <- function(path, pattern = NULL, recursive = FALSE, guess_max = 1
                                      format = "[:bar] :current of :total")
     summary <- purrr::map_df(files, ~{
       pb$tick()
-      frk_summarise_(.x, guess_max, verbose)
+      frk_summarise_(.x, guess_max, verbose, skip = skip)
     })
   } else {
     summary <- purrr::map_df(files, ~frk_summarise_(.x, guess_max, verbose))
@@ -78,7 +86,7 @@ frk_summarise <- function(path, pattern = NULL, recursive = FALSE, guess_max = 1
 #' @param guess_max Maximum number of records to use for guess
 #' @param verbose Whether to output guess as message
 #' @return A named list with the guesses for the specified file
-frk_summarise_ <- function(file, guess_max = 10, verbose = FALSE) {
+frk_summarise_ <- function(file, guess_max = 10, skip = NULL, verbose = FALSE) {
   
   # file extension
   file_ext <- base::tolower(tools::file_ext(file))
@@ -88,7 +96,7 @@ frk_summarise_ <- function(file, guess_max = 10, verbose = FALSE) {
     guessed_encoding <- guess_encoding(file, guess_max, verbose)
     
     # Guess lines to skip
-    guessed_skip <- guess_skip(file, guess_max, verbose)
+    guessed_skip <- if(is.null(skip)) guess_skip(file, guess_max, verbose) else skip
     
     # Guess delim
     guessed_delim <- guess_delim(file, guess_max, verbose, encoding = guessed_encoding, skip = guessed_skip)$char[1]
@@ -116,6 +124,7 @@ frk_summarise_ <- function(file, guess_max = 10, verbose = FALSE) {
     guessed_encoding <- as.character(NA)
     
     # Guess lines to skip
+    guessed_skip <- as.numeric(NA)
     guessed_skip <- as.numeric(NA)
     
     # Guess delim
